@@ -13,6 +13,7 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+//for get a room id
 void MainWindow::on_checkin_button_clicked()
 {
 
