@@ -27,12 +27,10 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
     client.cpp \
-    client.cpp \
     server.cpp
 
 HEADERS += \
         mainwindow.h \
-    client.h \
     client.h \
     server.h
 

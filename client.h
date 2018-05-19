@@ -1,7 +1,11 @@
 #ifndef CLIENT_H
 #define CLIENT_H
-
+#include <QtNetwork>
+#include <QMessageBox>
+#include <iostream>
 #include <QWidget>
+
+using namespace std;
 
 namespace Ui {
 class Client;
@@ -13,7 +17,14 @@ class Client : public QWidget
 
 public:
     explicit Client(QWidget *parent = 0);
+    initRoom(string id);
     ~Client();
+
+public slots:
+    void slotReadyRead();
+
+    void slotSendMsg();
+
 
 private slots:
     void on_button_On_Off_clicked();
@@ -34,6 +45,8 @@ private slots:
 
 private:
     Ui::Client *ui;
+    QTcpSocket* m_client;
+
 };
 
 #endif // CLIENT_H
