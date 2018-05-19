@@ -19,6 +19,8 @@ public:
 public slots:
     void slotNewConnection();
     void slotReadyRead();
+    void slotAcceptError();
+    void slotDestroyed();
 private:
     Ui::Server *ui;
     QTcpServer * m_server;

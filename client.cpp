@@ -8,25 +8,32 @@ Client::Client(QWidget *parent) :
     ui->setupUi(this);
     //创建套接字
     m_client = new QTcpSocket(this);
+
    //连接服务器
+
     m_client->connectToHost(QHostAddress::LocalHost,6666);
-    m_client->waitForConnected(1000);
+
     //通过信号通信服务器
     connect(m_client, &QTcpSocket::readyRead,
 
     this, &Client::slotReadyRead);
-    connect(ui->button_On_Off,&QPushButton::clicked,this,&Client::slotSendMsg);
+    connect(ui->button_On_Off,&QPushButton::clicked,this,&Client::slotSendOnOffMsg);
 }
+
+
+
+Client::~Client()
+{
+    Client::disconnect();
+    delete ui;
+}
+
 
 Client::initRoom(string id)
 {
     ui->label_roomid->setText(QString::fromStdString(id));
+    ui->input_t_room->setText("30.6");
 
-}
-
-Client::~Client()
-{
-    delete ui;
 }
 
 void Client::slotReadyRead()
@@ -35,13 +42,21 @@ void Client::slotReadyRead()
     QMessageBox::information(this,"Server Message",array);
 }
 
-void Client::slotSendMsg()
+void Client::slotSendOnOffMsg()
 {
     //send open request
     if(ui->button_On_Off->text()=="开机"){
 
-        m_client->write("hello,I am");
+        //m_client->write("hello,I am");
+        QJsonObject request_On_Obj;
+        request_On_Obj.insert("id",ui->label_roomid->text());
+        request_On_Obj.insert("operator","O");
+        request_On_Obj.insert("temperature",ui->input_t_room->text());
         ui->button_On_Off->setText("关机");
+        QJsonDocument request_On_Doc;
+        request_On_Doc.setObject(request_On_Obj);
+        QByteArray request_On_ByteArray=request_On_Doc.toJson(QJsonDocument::Compact);
+        m_client->write(request_On_ByteArray);
         //should init the infomation
     }
     else{

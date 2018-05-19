@@ -23,7 +23,7 @@ public:
 public slots:
     void slotReadyRead();
 
-    void slotSendMsg();
+    void slotSendOnOffMsg();
 
 
 private slots:

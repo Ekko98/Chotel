@@ -15,6 +15,8 @@ Server::Server(QWidget *parent) :
     //通过信号接收客户端请求
     connect(m_server,&QTcpServer::newConnection,this,
             &Server::slotNewConnection);
+    connect(m_server,&QTcpServer::acceptError,this,&Server::slotAcceptError);
+    connect(m_server,&QTcpServer::destroyed,this,&Server::slotDestroyed);
 }
 
 Server::~Server()
@@ -40,4 +42,17 @@ void Server::slotReadyRead()
     //接受数据
     QByteArray array=m_client->readAll();
     QMessageBox::information(this,"Client Message",array);
+    //处理数据
+    QJsonObject Request_Client=QJsonDocument::fromJson(array).object();
+    ui->label_room1_roomtem->setText(Request_Client.value("temperature").toString());
+}
+
+void Server::slotAcceptError()
+{
+    QMessageBox::information(this,"Error","This is a error!");
+}
+
+void Server::slotDestroyed()
+{
+    QMessageBox::information(this,"~","It disconnect!");
 }
