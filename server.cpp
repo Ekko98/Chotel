@@ -11,7 +11,7 @@ Server::Server(QWidget *parent) :
     // 创建套接字对象
     m_server = new QTcpServer(this);
     //设定监听模式
-    m_server->listen(QHostAddress::LocalHost,6666);
+    m_server->listen(QHostAddress::Any,6666);//监听从任意地址（any）的请求
     //通过信号接收客户端请求
     connect(m_server,&QTcpServer::newConnection,this,
             &Server::slotNewConnection);
@@ -26,7 +26,7 @@ Server::~Server()
 
 void Server::slotNewConnection()
 {
-    if(m_client==NULL){
+   {
         //处理客户端请求连接
         m_client=m_server->nextPendingConnection();
         m_client->write("服务器连接成功!");
