@@ -34,7 +34,7 @@ void Server::slotNewConnection()
     //处理客户端请求连接
     m_client=m_server->nextPendingConnection();
     m_client->write("服务器连接成功!");
-    list_client.append(m_client);
+    list_client.append(m_client);//添加至list
 
     //连接信号，接受客户端数据
     connect(m_client,&QTcpSocket::readyRead,
@@ -60,12 +60,12 @@ void Server::slotReadyRead()
         }
 }
 
-Server::send_message(QByteArray message,int number)
+Server::send_message(QByteArray message,int number)//发信息
 {
     list_client.at(number)->write(message);
 }
 
-void Server::slot_Disconnected()
+void Server::slot_Disconnected()//空调关闭
 {
     for(int i = 0;i < list_client.length();i ++){
         if(list_client.at(i)->state() != QAbstractSocket::ConnectedState)
