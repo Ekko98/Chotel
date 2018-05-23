@@ -25,7 +25,7 @@ public slots:
 
     void slotSendOnOffMsg();
 
-
+    void slotDisconnected();
 private slots:
     void on_button_On_Off_clicked();
 

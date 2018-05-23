@@ -5,18 +5,8 @@ Client::Client(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::Client)
 {
+    setAttribute(Qt::WA_DeleteOnClose);
     ui->setupUi(this);
-    //创建套接字
-    m_client = new QTcpSocket(this);
-
-   //连接服务器
-
-    m_client->connectToHost(QHostAddress::LocalHost,6666);
-
-    //通过信号通信服务器
-    connect(m_client, &QTcpSocket::readyRead,
-
-    this, &Client::slotReadyRead);
     connect(ui->button_On_Off,&QPushButton::clicked,this,&Client::slotSendOnOffMsg);
 }
 
@@ -24,7 +14,8 @@ Client::Client(QWidget *parent) :
 
 Client::~Client()
 {
-    Client::disconnect();
+    m_client->disconnectFromHost();
+    m_client->deleteLater();
     delete ui;
 }
 
@@ -40,12 +31,21 @@ void Client::slotReadyRead()
 {
     QByteArray array=m_client->readAll();
     QMessageBox::information(this,"Server Message",array);
+    //ui->label_roomid->setText(array);
+
 }
 
 void Client::slotSendOnOffMsg()
 {
     //send open request
     if(ui->button_On_Off->text()=="开机"){
+        //创建套接字
+        m_client = new QTcpSocket(this);
+       //连接服务器
+        m_client->connectToHost(QHostAddress::LocalHost,6666);
+        //通过信号通信服务器
+        connect(m_client, &QTcpSocket::readyRead,this, &Client::slotReadyRead);
+        connect(m_client, &QTcpSocket::disconnected, this, &Client::slotDisconnected);
 
         //m_client->write("hello,I am");
         QJsonObject request_On_Obj;
@@ -56,14 +56,25 @@ void Client::slotSendOnOffMsg()
         QJsonDocument request_On_Doc;
         request_On_Doc.setObject(request_On_Obj);
         QByteArray request_On_ByteArray=request_On_Doc.toJson(QJsonDocument::Compact);
-        m_client->write(request_On_ByteArray);
+        if(m_client->state()==QAbstractSocket::ConnectingState)
+        {
+            m_client->write(request_On_ByteArray);
+        }
+
+
         //should init the infomation
     }
     else{
         ui->button_On_Off->setText("开机");
         //clear the screen
-        m_client->write("bye");
+        m_client->disconnectFromHost();//断开连接
     }
+}
+
+void Client::slotDisconnected()
+{
+    QMessageBox::information(this,"Server Message","断开连接");
+    ui->button_On_Off->setText("开机");
 }
 
 // for open room's air-conditor
