@@ -17,13 +17,27 @@ class Server : public QWidget
 public:
     explicit Server(QWidget *parent = 0);
     send_message(QByteArray message,int number);
+    struct room{
+        QString roomtem;
+        QString aircond_tem;
+        QString cost;
+        QString fee;
+        QString speed;
+        QString mode;
+    };
     ~Server();
 public slots:
     void slotNewConnection();
     void slotReadyRead();
     void slotAcceptError();
     void slotDestroyed();
+    void read(QString id, room tmp);
+private slots:
+    void on_pushButton_clicked();
+
+
     void slot_Disconnected();
+
 private:
     Ui::Server *ui;
     QTcpServer * m_server;

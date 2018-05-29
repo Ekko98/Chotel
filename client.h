@@ -3,6 +3,7 @@
 #include <QtNetwork>
 #include <QMessageBox>
 #include <iostream>
+#include <QDebug>
 #include <QWidget>
 
 using namespace std;
@@ -26,6 +27,8 @@ public slots:
     void slotSendOnOffMsg();
 
     void slotDisconnected();
+
+    void slotSendotherMsg();
 private slots:
     void on_button_On_Off_clicked();
 
@@ -42,6 +45,10 @@ private slots:
     void on_button_up_1_clicked();
 
     void on_button_down_1_clicked();
+
+    void on_button_checkout_clicked();
+
+    void write_obj(QString my_operator);
 
 private:
     Ui::Client *ui;

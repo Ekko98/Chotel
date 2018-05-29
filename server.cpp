@@ -7,6 +7,7 @@ Server::Server(QWidget *parent) :
     m_client(NULL),
     ui(new Ui::Server)
 {
+
     setAttribute(Qt::WA_DeleteOnClose);
     ui->setupUi(this);
     // 创建套接字对象
@@ -18,7 +19,7 @@ Server::Server(QWidget *parent) :
             &Server::slotNewConnection);
     connect(m_server,&QTcpServer::acceptError,this,&Server::slotAcceptError);
     connect(m_server,&QTcpServer::destroyed,this,&Server::slotDestroyed);
-
+    //ui->widget_room1_shade->hide();
 
 }
 
@@ -44,6 +45,23 @@ void Server::slotNewConnection()
 
 void Server::slotReadyRead()
 {
+    //接受数据
+    QByteArray array=m_client->readAll();
+    QMessageBox::information(this,"Client Message",array);
+    //处理数据
+    QJsonObject Request_Client=QJsonDocument::fromJson(array).object();
+    ui->label_room1_roomtem->setText(Request_Client.value("temperature").toString());
+    //输出数据
+    room tmp;
+    tmp.aircond_tem=QString::number(26);
+    QString id=Request_Client.value("id").toString();
+    tmp.cost=QString::number(0);
+    tmp.fee=QString::number(0);
+    tmp.mode=Request_Client.value("operator").toString();
+    tmp.roomtem=QString::number(Request_Client.value("temperature").toDouble());
+    tmp.speed=Request_Client.value("operator").toString();
+    read(id,tmp);
+
     int number;
     for(int i = 0;i < list_client.length();i ++)
         {
@@ -76,6 +94,8 @@ void Server::slot_Disconnected()//空调关闭
             QMessageBox::information(this,"Client Message","空调关闭");
         }
     }
+    ui->widget_room1->hide();
+    //ui->widget_room1_shade->show();
 }
 
 
@@ -87,4 +107,42 @@ void Server::slotAcceptError()
 void Server::slotDestroyed()
 {
     QMessageBox::information(this,"~","It disconnect!");
+}
+
+void Server::on_pushButton_clicked()
+{
+
+}
+
+void Server::read(QString id,room tmp){
+
+    bool speed_flag=true;
+    bool mode_flag=true;
+    if(tmp.speed=="H") tmp.speed="高速";
+    else if(tmp.speed=="M") tmp.speed="中速";
+    else if(tmp.speed=="L") tmp.speed="低速";
+    else speed_flag=false;
+
+    if(tmp.mode=="W") tmp.mode="制热";
+    else if(tmp.mode=="C") tmp.mode="制冷";
+    else mode_flag=false;
+    //ip
+    int ip=id.toInt();
+    switch(ip){
+        case 1:
+            ui->label_room1_roomtem->setText(tmp.roomtem);
+            ui->lineEdit_room1_aircond_tem->setText(tmp.aircond_tem);
+            ui->lineEdit_room1_cost->setText(tmp.cost);
+            ui->lineEdit_room1_fee->setText(tmp.fee);
+            if(speed_flag)
+                ui->lineEdit_room1_speed->setText(tmp.speed);
+            if(mode_flag)
+                ui->lineEdit_room1_mode->setText(tmp.mode);
+        break;
+        case 2:break;
+        case 3:break;
+        case 4:break;
+        case 5:break;
+        defalut:break;
+    }
 }
