@@ -1,9 +1,11 @@
 #include "client.h"
 #include "ui_client.h"
-int room_set=26;
+
+int room_set;
 float room_air;
-QJsonObject request_On_Obj;
-bool on_flag=false;
+bool on_flag;
+
+
 Client::Client(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::Client)
@@ -12,7 +14,23 @@ Client::Client(QWidget *parent) :
     ui->setupUi(this);
     connect(ui->button_On_Off,&QPushButton::clicked,this,&Client::slotSendOnOffMsg);
     //connect(ui->button_speed_high,&QPushButton::clicked,this,&Client::slotSendotherMsg);
-    connect(ui->button_mode_hot,&QPushButton::clicked,this,&Client::slotSendotherMsg);
+    //connect(ui->button_mode_hot,&QPushButton::clicked,this,&Client::slotSendotherMsg);
+    timer = new QTimer(this);
+    timer2= new QTimer(this);
+    connect(timer2,&QTimer::timeout,this,&Client::huiwen);
+    connect(timer,&QTimer::timeout,this,&Client::slot_send);
+    on_flag=false;
+    room_set=26;
+    //创建套接字
+    m_client = new QTcpSocket(this);
+   //连接服务器
+    m_client->connectToHost("127.0.0.1",6666);
+
+    //通过信号通信服务器
+    connect(m_client, &QTcpSocket::readyRead,this, &Client::slotReadyRead);
+    connect(m_client, &QTcpSocket::disconnected, this, &Client::slotDisconnected);
+
+
 }
 
 
@@ -25,19 +43,51 @@ Client::~Client()
 }
 
 
-Client::initRoom(string id)
+void Client::initRoom(string id)
 {
     ui->label_roomid->setText(QString::fromStdString(id));
-    ui->input_t_room->setText("30.6");
 
 }
 
 void Client::slotReadyRead()
 {
     QByteArray array=m_client->readAll();
-    QMessageBox::information(this,"Server Message",array);
-    //ui->label_roomid->setText(array);
+    //QMessageBox::information(this,"Server Message",array);
+    QJsonObject Request_Client=QJsonDocument::fromJson(array).object();
+    ui->input_t_room->setText(Request_Client.value("temperature").toString());
+    //ui->input_mode->setText(Request_Client.value("state").toString());
+    ui->input_fee->setText(Request_Client.value("fee").toString());
+    //ui->input_speed->setText(Request_Client.value("gear").toString());
+    QString temp=Request_Client.value("state").toString();
+    if(temp=="S"){
+        ui->input_mode->setText("已关机");
+        timer->stop();
+    }
+    else if(temp=="W"){
+         ui->input_mode->setText("制热");
+    }
+    else if(temp=="C"){
+        ui->input_mode->setText("制冷");
+    }
+    else if(temp=="A"){
+         ui->input_mode->setText("自动");
+    }
+    else if(temp=="X"){
+        ui->input_mode->setText("到温");
+        timer2->start(1000);
+    }
+    temp=Request_Client.value("gear").toString();
+    if(temp=="H"){
+        ui->input_speed->setText("高速");
+    }
+    else if(temp=="M"){
+        ui->input_speed->setText("中速");
+    }
+    else if(temp=="L"){
+        ui->input_speed->setText("低速");
+    }
 
+    //ui->label_roomid->setText(array);
 }
 
 void Client::slotSendOnOffMsg()
@@ -45,66 +95,58 @@ void Client::slotSendOnOffMsg()
     //send open request
     if(ui->button_On_Off->text()=="开机"){
         ui->button_On_Off->setText("关机");
-        //创建套接字
-        m_client = new QTcpSocket(this);
-       //连接服务器
-        m_client->connectToHost("127.0.0.1",6666);
-        qDebug()<<m_client->errorString();
-
-        //通过信号通信服务器
-        connect(m_client, &QTcpSocket::readyRead,this, &Client::slotReadyRead);
-        connect(m_client, &QTcpSocket::disconnected, this, &Client::slotDisconnected);
-
-        connect(ui->button_speed_high,&QPushButton::clicked,this,&Client::slotSendotherMsg);
-        connect(ui->button_speed_middle,&QPushButton::clicked,this,&Client::slotSendotherMsg);
-         connect(ui->button_speed_low,&QPushButton::clicked,this,&Client::slotSendotherMsg);
-
         //m_client->write("hello,I am");
         on_flag=true;
+        ui->input_t_room->setText("30");
+        ui->input_t_aircondi->setText("26");
         write_obj("O");
         QJsonDocument request_On_Doc;
         request_On_Doc.setObject(request_On_Obj);
         QByteArray request_On_ByteArray=request_On_Doc.toJson(QJsonDocument::Compact);
-        if(m_client->state()==QAbstractSocket::ConnectingState)
-        {
-            m_client->write(request_On_ByteArray);
-        }
+        m_client->write(request_On_ByteArray);
+
 
         //should init the infomation
-        ui->input_t_aircondi->setText("26");
-        ui->input_fee->setText("0.0");
-        ui->input_speed->setText("低速");
-        ui->input_mode->setText("制冷");
+        //ui->input_fee->setText("0.0");
+        //ui->input_speed->setText("低速");
+        //ui->input_mode->setText("制冷");
         //ui->input_fee->setText(request_On_Obj.value("temperature").toString());
+
+
+        timer->start(stall); // 5秒单触发定时器
     }
     else{
         on_flag=false;
         ui->button_On_Off->setText("开机");
         //clear the screen
-        //write_obj("S");
-        m_client->write("bye");
-        ui->input_t_aircondi->setText("");
-        ui->input_fee->setText("");
-        ui->input_speed->setText("");
-        ui->input_mode->setText("");
-        m_client->disconnectFromHost();//断开连接
-
+        write_obj("S");
+        //m_client->write("bye");
+        //ui->input_t_aircondi->setText("");
+        //ui->input_fee->setText("");
+        //ui->input_speed->setText("");
+        //ui->input_mode->setText("");
+        //ui->input_t_room->setText("");
+        //m_client->disconnectFromHost();//断开连接
+        QJsonDocument request_On_Doc;
+        request_On_Doc.setObject(request_On_Obj);
+        QByteArray request_On_ByteArray=request_On_Doc.toJson(QJsonDocument::Compact);
+        m_client->write(request_On_ByteArray);
     }
 }
 
-void Client::slotSendotherMsg()
-{
-//    if(on_flag==true){
-//        write_obj("H");
-//        ui->input_mode->setText("制冷");
-//    }
+//void Client::slotSendotherMsg()
+//{
+////    if(on_flag==true){
+////        write_obj("H");
+////        ui->input_mode->setText("制冷");
+////    }
 
-    QJsonDocument request_On_Doc;
-    request_On_Doc.setObject(request_On_Obj);
-    QByteArray request_On_ByteArray=request_On_Doc.toJson(QJsonDocument::Compact);
-    if(m_client->state()==QAbstractSocket::ConnectedState)
-        m_client->write(request_On_ByteArray);
-}
+//    QJsonDocument request_On_Doc;
+//    request_On_Doc.setObject(request_On_Obj);
+//    QByteArray request_On_ByteArray=request_On_Doc.toJson(QJsonDocument::Compact);
+//    if(m_client->state()==QAbstractSocket::ConnectingState || m_client->state()==QAbstractSocket::ConnectedState)
+//        m_client->write(request_On_ByteArray);
+//}
 
 void Client::slotDisconnected()
 {
@@ -144,6 +186,10 @@ void Client::on_button_speed_low_clicked()
     if(on_flag==true){
         write_obj("L");
         ui->input_speed->setText("低速");
+        QJsonDocument request_On_Doc;
+        request_On_Doc.setObject(request_On_Obj);
+        QByteArray request_On_ByteArray=request_On_Doc.toJson(QJsonDocument::Compact);
+        m_client->write(request_On_ByteArray);
     }
 }
 
@@ -154,6 +200,10 @@ void Client::on_button_speed_middle_clicked()
     if(on_flag==true){
         write_obj("M");
         ui->input_speed->setText("中速");
+        QJsonDocument request_On_Doc;
+        request_On_Doc.setObject(request_On_Obj);
+        QByteArray request_On_ByteArray=request_On_Doc.toJson(QJsonDocument::Compact);    
+        m_client->write(request_On_ByteArray);
     }
 }
 
@@ -161,10 +211,14 @@ void Client::on_button_speed_middle_clicked()
 //for request a high speed
 void Client::on_button_speed_high_clicked()
 {
-//    if(on_flag==true){
-//        write_obj("H");
-//        ui->input_speed->setText("高速");
-//    }
+    if(on_flag==true){
+        write_obj("H");
+       ui->input_speed->setText("高速");
+       QJsonDocument request_On_Doc;
+       request_On_Doc.setObject(request_On_Obj);
+       QByteArray request_On_ByteArray=request_On_Doc.toJson(QJsonDocument::Compact);
+       m_client->write(request_On_ByteArray);
+    }
 }
 
 
@@ -210,6 +264,34 @@ void Client::write_obj(QString my_operator){
     request_On_Obj.remove("temperature");
     request_On_Obj.insert("id",ui->label_roomid->text());
     request_On_Obj.insert("operator",my_operator);
-    request_On_Obj.insert("temperature",ui->input_t_room->text());
+    if(my_operator=="O")
+        request_On_Obj.insert("temperature",ui->input_t_room->text());
+    else
+        request_On_Obj.insert("temperature",ui->input_t_aircondi->text());
 }
 
+void Client::slot_send(){
+    write_obj("U");
+    QJsonDocument request_On_Doc;
+    request_On_Doc.setObject(request_On_Obj);
+    QByteArray request_On_ByteArray=request_On_Doc.toJson(QJsonDocument::Compact);
+    m_client->write(request_On_ByteArray);
+}
+
+
+//something wrong
+void Client::huiwen(){
+    float num = ui->input_t_room->text().toFloat();
+    float num1 = ui->input_t_aircondi->text().toFloat();
+    num+=0.1;
+    ui->input_t_room->setText(QString::number(num));
+    //ui->input_t_aircondi->setText(num1);
+    if(num-num1>=2||num-num1<=-2){
+        timer2->stop();
+        write_obj("O");//
+        QJsonDocument request_On_Doc;
+        request_On_Doc.setObject(request_On_Obj);
+        QByteArray request_On_ByteArray=request_On_Doc.toJson(QJsonDocument::Compact);
+        m_client->write(request_On_ByteArray);
+    }
+}

@@ -27,7 +27,9 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
     client.cpp \
-    server.cpp
+    server.cpp \
+    servered.cpp \
+    scheduled.cpp
 
 HEADERS += \
         mainwindow.h \

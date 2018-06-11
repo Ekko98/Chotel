@@ -4,6 +4,63 @@
 #include <QtNetwork>
 #include <QMessageBox>
 #include <QWidget>
+#include <QMap>
+#include <QList>
+#include<QTimer>
+
+#define zhire "W"
+#define zhileng "C"
+#define mid "M"
+#define high "H"
+#define low "L"
+#define fee_mid 2
+#define fee_low 1
+#define fee_high 3
+#define ope "O"
+#define clo "S"
+#define updat "U"
+#define schedule_stall 2
+#define rate_low 0.1
+#define rate_mid 0.2
+#define rate_high 0.25
+
+class Servered:  QObject{
+    Q_OBJECT
+public:
+    Servered(){}
+    void start();
+    void end();
+    int time=0;
+    QString id;
+    bool X=false;
+    QTimer *t;
+public slots:
+    int work();
+};
+
+class Scheduled:  QObject{
+    Q_OBJECT
+public:
+    Scheduled(){}
+    int time;
+    QString id;
+
+    QTimer *t;
+    void start();
+    void end();
+public slots:
+     void timer();
+};
+
+struct room{
+
+    float roomtem;
+    float aircond_tem;
+    float fee;
+    QString gear;
+    QString state;
+};
+
 
 
 namespace Ui {
@@ -16,26 +73,19 @@ class Server : public QWidget
 
 public:
     explicit Server(QWidget *parent = 0);
-    send_message(QByteArray message,int number);
-    struct room{
-        QString roomtem;
-        QString aircond_tem;
-        QString cost;
-        QString fee;
-        QString speed;
-        QString mode;
-    };
+    void send_message(int number,QString id);
+    void read(QString id, room tmp);
+    void control(QJsonObject Request);
+    void bill();
     ~Server();
 public slots:
     void slotNewConnection();
     void slotReadyRead();
     void slotAcceptError();
     void slotDestroyed();
-    void read(QString id, room tmp);
+
 private slots:
     void on_pushButton_clicked();
-
-
     void slot_Disconnected();
 
 private:
@@ -44,6 +94,11 @@ private:
     QTcpSocket * m_client;
     QList<QTcpSocket *> list_client;
     QByteArray message;
+    int standard;
+
 };
+
+
+
 
 #endif // SERVER_H

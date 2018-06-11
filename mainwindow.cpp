@@ -5,6 +5,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
+    //setAttribute(Qt::WA_DeleteOnClose);
     ui->setupUi(this);
 }
 
@@ -19,7 +20,7 @@ void MainWindow::on_checkin_button_clicked()
  if(ui->input_name->text()!=QString("admin")){
      Client * NewRoom=new Client();
      NewRoom->show();
-     NewRoom->initRoom(ui->input_name->text().toStdString());
+     NewRoom->initRoom("306G"+ui->input_name->text().toStdString());
  }
  else{
      Server * Admin=new Server();
