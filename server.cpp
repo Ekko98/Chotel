@@ -25,10 +25,13 @@ Server::Server(QWidget *parent) :
     connect(m_server,&QTcpServer::acceptError,this,&Server::slotAcceptError);
     connect(m_server,&QTcpServer::destroyed,this,&Server::slotDestroyed);
     //ui->widget_room1_shade->hide();
+    init_db();
+
 }
 
 Server::~Server()
 {
+    database.close();
     m_server->close();
     m_server->deleteLater();
     delete ui;
@@ -93,6 +96,7 @@ void Server::slotReadyRead()
                        temp_Sc->start();
 
                    }
+                   insert_bill(id,"开机");
                }
                if(temp=="H"){
                    mi=inf.find(id);
@@ -115,6 +119,7 @@ void Server::slotReadyRead()
                        temp_Se->start();
 
                    }
+                   insert_bill(id,"申请高风速");
                }
                if(temp=="M"){
                    mi=inf.find(id);
@@ -132,6 +137,7 @@ void Server::slotReadyRead()
                        temp_Sc->start();
 
                    }
+                   insert_bill(id,"申请中风速");
                }
                if(temp=="L"){
                    mi=inf.find(id);
@@ -149,10 +155,12 @@ void Server::slotReadyRead()
                        temp_Sc->start();
 
                    }
+                   insert_bill(id,"申请低风速");
                }
                if(temp=="S"){
                    mi=inf.find(id);
                    mi->state=clo;
+                   insert_bill(id,"关机");
                }
                if(temp=="U"){
                    send_message(number,id);
@@ -255,7 +263,86 @@ void Server::on_pushButton_clicked()
 //        defalut:break;
 //    }
 //}
-
-void Server::bill(){
-
+void Server::init_db(){
+    if (QSqlDatabase::contains("qt_sql_default_connection"))
+    {
+        database = QSqlDatabase::database("qt_sql_default_connection");
+    }
+    else
+    {
+        database = QSqlDatabase::addDatabase("QSQLITE");
+        database.setDatabaseName("aircondition.db");
+        database.setUserName("admin");
+        database.setPassword("");
+    }
+    if (!database.open())
+    {
+        qDebug() << "Error: Failed to connect database." << database.lastError();
+    }
+    else
+    {
+        QSqlQuery sql_query;
+        QString create_sql = "create table bill ("
+                             "time varchar(50), "
+                             "id varchar(30), "
+                             "operation varchar(20),"
+                             "fee varchar(20)"
+                             ")";
+        sql_query.prepare(create_sql);
+        if(!sql_query.exec())
+        {
+            qDebug() << "Error: Fail to create table." << sql_query.lastError();
+        }
+        else
+        {
+            qDebug() << "Table created!";
+        }
+    }
 }
+
+void Server::insert_bill(QString id,QString op){
+    {
+        QDateTime current_date_time =QDateTime::currentDateTime();
+        QString current_date =current_date_time.toString("yyyy.MM.dd hh:mm:ss");
+        QMap<QString, struct room>::iterator p;
+        p=inf.find(id);
+        QString insert_sql = "insert into bill values (?, ?, ?, ?)";
+        QSqlQuery sql_query;
+        sql_query.prepare(insert_sql);
+        sql_query.addBindValue(current_date);
+        sql_query.addBindValue(id);
+        sql_query.addBindValue(op);
+        sql_query.addBindValue(QString::number(p->fee));
+        if(!sql_query.exec())
+        {
+            qDebug() << sql_query.lastError();
+        }
+        else
+        {
+            qDebug() << "inserted!";
+        }
+    }
+}
+
+void Server::generate_bill(QString id){
+    QString select_sql = "select * from student where id=:id";\
+    QSqlQuery sql_query;
+    sql_query.prepare(select_sql);
+    sql_query.bindValue(":id","\""+id+"\"");
+    if(!sql_query.exec())
+    {
+        qDebug()<<sql_query.lastError();
+    }
+    else
+    {
+        while(sql_query.next())
+        {
+            QString ttime = sql_query.value(0).toString();
+            QString tid = sql_query.value(1).toString();
+            QString top = sql_query.value(2).toString();
+            QString fee = sql_query.value(3).toString();
+
+        }
+    }
+}
+
