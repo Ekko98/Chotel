@@ -8,6 +8,11 @@
 #include <QList>
 #include<QTimer>
 #include<dsheet.h>
+#include <QSqlDatabase>
+#include <QSqlError>
+#include <QSqlQuery>
+#include <QDebug>
+
 
 #define zhire "W"
 #define zhileng "C"
@@ -79,7 +84,9 @@ public:
     void send_message(int number,QString id);
     void read(QString id, room tmp);
     void control(QJsonObject Request);
-    void bill();
+    void insert_bill(QString id,QString op);
+    void init_db();
+    void generate_bill(QString id);
     ~Server();
 public slots:
     void slotNewConnection();
@@ -100,7 +107,7 @@ private:
     QList<QTcpSocket *> list_client;
     QByteArray message;
     int standard;
-
+    QSqlDatabase database;
 };
 
 

@@ -36,6 +36,7 @@ int Servered::work(){
             }
         }
         this->time++;
+
         if( (mi.value().roomtem-mi.value().aircond_tem)<=0)
         {
             mi.value().state="X";
