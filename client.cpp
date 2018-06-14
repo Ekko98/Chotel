@@ -1,6 +1,6 @@
 #include "client.h"
 #include "ui_client.h"
-
+extern QMap<QString,struct room> inf;
 int room_set;
 float room_air;
 bool on_flag;
@@ -23,7 +23,7 @@ Client::Client(QWidget *parent) :
     room_set=26;
     //创建套接字
     m_client = new QTcpSocket(this);
-   //连接服务器
+    //连接服务器
     m_client->connectToHost("127.0.0.1",6666);
 
     //通过信号通信服务器
@@ -62,18 +62,20 @@ void Client::slotReadyRead()
     if(temp=="S"){
         ui->input_mode->setText("已关机");
         timer->stop();
+
     }
     else if(temp=="W"){
-         ui->input_mode->setText("制热");
+        ui->input_mode->setText("制热");
     }
     else if(temp=="C"){
         ui->input_mode->setText("制冷");
     }
     else if(temp=="A"){
-         ui->input_mode->setText("自动");
+        ui->input_mode->setText("自动");
     }
     else if(temp=="X"){
-        ui->input_mode->setText("到温");
+        ui->input_mode->setText("回温中");
+        timer->stop();
         timer2->start(1000);
     }
     temp=Request_Client.value("gear").toString();
@@ -97,14 +99,17 @@ void Client::slotSendOnOffMsg()
         ui->button_On_Off->setText("关机");
         //m_client->write("hello,I am");
         on_flag=true;
-        ui->input_t_room->setText("30");
-        ui->input_t_aircondi->setText("26");
+        if(inf.find(ui->label_roomid->text())==inf.end())
+        {
+            ui->input_t_room->setText("30");
+            ui->input_t_aircondi->setText("26");
+        }
         write_obj("O");
         QJsonDocument request_On_Doc;
         request_On_Doc.setObject(request_On_Obj);
         QByteArray request_On_ByteArray=request_On_Doc.toJson(QJsonDocument::Compact);
         m_client->write(request_On_ByteArray);
-
+        timer2->stop();
 
         //should init the infomation
         //ui->input_fee->setText("0.0");
@@ -117,7 +122,6 @@ void Client::slotSendOnOffMsg()
     }
     else{
         on_flag=false;
-        ui->button_On_Off->setText("开机");
         //clear the screen
         write_obj("S");
         //m_client->write("bye");
@@ -131,6 +135,9 @@ void Client::slotSendOnOffMsg()
         request_On_Doc.setObject(request_On_Obj);
         QByteArray request_On_ByteArray=request_On_Doc.toJson(QJsonDocument::Compact);
         m_client->write(request_On_ByteArray);
+        //timer->stop();
+        ui->button_On_Off->setText("开机");
+
     }
 }
 
@@ -151,7 +158,7 @@ void Client::slotSendOnOffMsg()
 void Client::slotDisconnected()
 {
     QMessageBox::information(this,"Server Message","断开连接");
-    ui->button_On_Off->setText("开机");
+
 }
 
 // for open room's air-conditor
@@ -202,7 +209,7 @@ void Client::on_button_speed_middle_clicked()
         ui->input_speed->setText("中速");
         QJsonDocument request_On_Doc;
         request_On_Doc.setObject(request_On_Obj);
-        QByteArray request_On_ByteArray=request_On_Doc.toJson(QJsonDocument::Compact);    
+        QByteArray request_On_ByteArray=request_On_Doc.toJson(QJsonDocument::Compact);
         m_client->write(request_On_ByteArray);
     }
 }
@@ -213,11 +220,11 @@ void Client::on_button_speed_high_clicked()
 {
     if(on_flag==true){
         write_obj("H");
-       ui->input_speed->setText("高速");
-       QJsonDocument request_On_Doc;
-       request_On_Doc.setObject(request_On_Obj);
-       QByteArray request_On_ByteArray=request_On_Doc.toJson(QJsonDocument::Compact);
-       m_client->write(request_On_ByteArray);
+        ui->input_speed->setText("高速");
+        QJsonDocument request_On_Doc;
+        request_On_Doc.setObject(request_On_Obj);
+        QByteArray request_On_ByteArray=request_On_Doc.toJson(QJsonDocument::Compact);
+        m_client->write(request_On_ByteArray);
     }
 }
 
@@ -284,14 +291,24 @@ void Client::huiwen(){
     float num = ui->input_t_room->text().toFloat();
     float num1 = ui->input_t_aircondi->text().toFloat();
     num+=0.1;
+
     ui->input_t_room->setText(QString::number(num));
+
     //ui->input_t_aircondi->setText(num1);
     if(num-num1>=2||num-num1<=-2){
         timer2->stop();
-        write_obj("O");//
-        QJsonDocument request_On_Doc;
-        request_On_Doc.setObject(request_On_Obj);
-        QByteArray request_On_ByteArray=request_On_Doc.toJson(QJsonDocument::Compact);
-        m_client->write(request_On_ByteArray);
+
+        if(ui->button_On_Off->text()=="关机"){
+            timer->start(stall);
+            write_obj("O");//
+            QJsonDocument request_On_Doc;
+            request_On_Doc.setObject(request_On_Obj);
+            QByteArray request_On_ByteArray=request_On_Doc.toJson(QJsonDocument::Compact);
+            m_client->write(request_On_ByteArray);
+        }
+        else{
+            ui->input_mode->setText("已关机");
+        }
+
     }
 }

@@ -29,14 +29,17 @@ SOURCES += \
     client.cpp \
     server.cpp \
     servered.cpp \
-    scheduled.cpp
+    scheduled.cpp \
+    dsheet.cpp
 
 HEADERS += \
         mainwindow.h \
     client.h \
-    server.h
+    server.h \
+    dsheet.h
 
 FORMS += \
         mainwindow.ui \
     client.ui \
-    server.ui
+    server.ui \
+    dsheet.ui

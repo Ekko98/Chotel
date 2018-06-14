@@ -36,10 +36,10 @@ int Servered::work(){
             }
         }
         this->time++;
-        if( (mi.value().roomtem-mi.value().aircond_tem)<=0.01)
+        if( (mi.value().roomtem-mi.value().aircond_tem)<=0)
         {
             mi.value().state="X";
-            this->end();
+
         }
         else return 0;
     }
@@ -49,7 +49,7 @@ int Servered::work(){
 
 
 void Servered::start(){
-    this->time=0;
+    this->time=inf.find(this->id).value().time;
     this->t= new QTimer();
     connect(this->t,SIGNAL(timeout()),this,SLOT(work()));
     this->t->start(1000);
@@ -59,4 +59,5 @@ void Servered::end(){
     t->stop();
     t->deleteLater();
     this->X=true;
+    inf.find(this->id).value().time=this->time;
 }

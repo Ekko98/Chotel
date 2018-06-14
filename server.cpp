@@ -27,6 +27,9 @@ Server::Server(QWidget *parent) :
     //ui->widget_room1_shade->hide();
 }
 
+
+
+
 Server::~Server()
 {
     m_server->close();
@@ -60,108 +63,215 @@ void Server::slotReadyRead()
 
     int number;
     for(int i = 0;i < list_client.length();i ++)
-        {
-           message=list_client.at(i)->readAll();
-           if(!message.isEmpty()){
-               number=i;
-               //QMessageBox::information(this,"Client Message",message);
-               QJsonObject Request_Client=QJsonDocument::fromJson(message).object();
-               struct room tmp;
-               QString id;
-               id=Request_Client.value("id").toString();
-               QMap<QString, struct room>::iterator mi;
-               //ui->label_room1_roomtem->setText(Request_Client.value("temperature").toString());
-               QString temp=Request_Client.value("operator").toString();
-               if(temp=="O"){
-                   tmp.aircond_tem=standard;
-                   tmp.fee=0;
-                   tmp.state=zhileng;
-                   tmp.roomtem=Request_Client.value("temperature").toString().toFloat();
-                   //qDebug()<<Request_Client.value("temperature");
-                   tmp.gear=mid;
-                   inf.insert(id,tmp);
-                   if(se.size()<6){
-                       Servered *temp_Se=new Servered();
-                       temp_Se->id=id;
-                       se.append(temp_Se);
-                       temp_Se->start();
-                   }
-                   else{
-                       Scheduled *temp_Sc=new Scheduled();
-                       temp_Sc->id=id;
-                       sc.append(temp_Sc);
-                       temp_Sc->start();
+    {
+        message=list_client.at(i)->readAll();
+        if(!message.isEmpty()){
+            number=i;
+            //QMessageBox::information(this,"Client Message",message);
+            QJsonObject Request_Client=QJsonDocument::fromJson(message).object();
+            struct room tmp;
+            QString id;
+            id=Request_Client.value("id").toString();
+            QMap<QString, struct room>::iterator mi;
+            //ui->label_room1_roomtem->setText(Request_Client.value("temperature").toString());
+            QString temp=Request_Client.value("operator").toString();
+            bool Inse=false;
+            bool Insc=false;
+            if(temp=="O"){
+                //maybe some bug
+                if(inf.find(id)==inf.end()){
+                    tmp.aircond_tem=standard;
+                    tmp.fee=0;
+                    tmp.state=zhileng;
+                    tmp.roomtem=Request_Client.value("temperature").toString().toFloat();
+                    //qDebug()<<Request_Client.value("temperature");
+                    tmp.gear=mid;
+                    inf.insert(id,tmp);
+                    if(se.size()<que_max){
+                        Servered *temp_Se=new Servered();
+                        temp_Se->id=id;
+                        se.append(temp_Se);
+                        temp_Se->start();
+                    }
+                    else{
+                        Scheduled *temp_Sc=new Scheduled();
+                        temp_Sc->id=id;
+                        sc.append(temp_Sc);
+                        temp_Sc->start();
 
-                   }
-               }
-               if(temp=="H"){
-                   mi=inf.find(id);
-                   mi->gear=high;
-                   if(se.size()<6){
-                       Servered *temp_Se=new Servered();
-                       temp_Se->id=id;
-                       se.append(temp_Se);
-                       temp_Se->start();
-                   }
-                   else{
-                       se.at(0)->end();
-                       Scheduled *temp_Sc=new Scheduled();
-                       temp_Sc->id=se.at(0)->id;
-                       se.removeAt(0);
-                       sc.append(temp_Sc);
-                       Servered *temp_Se=new Servered();
-                       temp_Se->id=id;
-                       se.append(temp_Se);
-                       temp_Se->start();
+                    }
+                }
+                else{
+                    inf.find(id).value().state=zhileng;
+                    inf.find(id).value().roomtem=Request_Client.value("temperature").toString().toFloat();
+                    if(se.size()<que_max){
+                        Servered *temp_Se=new Servered();
+                        temp_Se->id=id;
+                        se.append(temp_Se);
+                        temp_Se->start();
+                    }
+                    else{
+                        if(inf.find(id).value().gear!=high){
+                            Scheduled *temp_Sc=new Scheduled();
+                            temp_Sc->id=id;
+                            sc.append(temp_Sc);
+                            temp_Sc->start();
+                        }
+                        else{
+                            se.at(0)->end();
+                            Scheduled *temp_Sc=new Scheduled();
+                            temp_Sc->id=se.at(0)->id;
+                            temp_Sc->start();
+                            se.removeAt(0);
+                            sc.append(temp_Sc);
 
-                   }
-               }
-               if(temp=="M"){
-                   mi=inf.find(id);
-                   mi->gear=mid;
-                   if(se.size()<6){
-                       Servered *temp_Se=new Servered();
-                       temp_Se->id=id;
-                       se.append(temp_Se);
-                       temp_Se->start();
-                   }
-                   else{
-                       Scheduled *temp_Sc=new Scheduled();
-                       temp_Sc->id=id;
-                       sc.append(temp_Sc);
-                       temp_Sc->start();
+                            Servered *temp_Se=new Servered();
+                            temp_Se->id=id;
+                            se.append(temp_Se);
+                            temp_Se->start();
+                        }
 
-                   }
-               }
-               if(temp=="L"){
-                   mi=inf.find(id);
-                   mi->gear=low;
-                   if(se.size()<6){
-                       Servered *temp_Se=new Servered();
-                       temp_Se->id=id;
-                       se.append(temp_Se);
-                       temp_Se->start();
-                   }
-                   else{
-                       Scheduled *temp_Sc=new Scheduled();
-                       temp_Sc->id=id;
-                       sc.append(temp_Sc);
-                       temp_Sc->start();
+                    }
+                    send_message(number,id);
+                }
+            }
+            if(temp=="H"){
+                int k=0;
+                for(int i=0;i<se.size();i++){
+                    if(se.at(i)->id==id){
+                        Inse=true;
+                        break;
+                    }
+                }
+                for(;k<sc.size();k++){
+                    if(sc.at(k)->id==id){
+                        Insc=true;
+                        break;
+                    }
+                }
+                mi=inf.find(id);
 
-                   }
-               }
-               if(temp=="S"){
-                   mi=inf.find(id);
-                   mi->state=clo;
-               }
-               if(temp=="U"){
-                   send_message(number,id);
-               }
-           }
+                if(Inse){
+                    //                       Servered *temp_Se=new Servered();
+                    //                       temp_Se->id=id;
+                    //                       se.append(temp_Se);
+                    //                       temp_Se->start();
+                }
+                else if(Insc&&mi->gear!=high){
+                    sc.removeAt(k);
+                    se.at(0)->end();
+                    Scheduled *temp_Sc=new Scheduled();
+                    temp_Sc->id=se.at(0)->id;
+                    temp_Sc->start();
+                    se.removeAt(0);
+                    sc.append(temp_Sc);
+
+                    Servered *temp_Se=new Servered();
+                    temp_Se->id=id;
+                    se.append(temp_Se);
+                    temp_Se->start();
+
+                }
+                mi->gear=high;
+            }
+            if(temp=="M"){
+                mi=inf.find(id);
+                mi->gear=mid;
+//                if(se.size()<que_max){
+//                    Servered *temp_Se=new Servered();
+//                    temp_Se->id=id;
+//                    se.append(temp_Se);
+//                    temp_Se->start();
+//                }
+//                else{
+//                    Scheduled *temp_Sc=new Scheduled();
+//                    temp_Sc->id=id;
+//                    sc.append(temp_Sc);
+//                    temp_Sc->start();
+
+//                }
+            }
+            if(temp=="L"){
+                mi=inf.find(id);
+                mi->gear=low;
+//                if(se.size()<que_max){
+//                    Servered *temp_Se=new Servered();
+//                    temp_Se->id=id;
+//                    se.append(temp_Se);
+//                    temp_Se->start();
+//                }
+//                else{
+//                    Scheduled *temp_Sc=new Scheduled();
+//                    temp_Sc->id=id;
+//                    sc.append(temp_Sc);
+//                    temp_Sc->start();
+
+//                }
+            }
+            if(temp=="S"){
+                mi=inf.find(id);
+                mi->state=clo;
+                for(int i=0;i<se.size();i++){
+                    if(se.at(i)->id==id){
+                        se.at(i)->end();
+                        se.removeAt(i);
+                        if(sc.size()!=0){
+                            sc.at(0)->end();
+                            Servered *temp_Se=new Servered();
+                            temp_Se->id=sc.at(0)->id;
+                            sc.removeAt(0);
+                            se.append(temp_Se);
+                            temp_Se->start();
+                        }
+
+                        break;
+                    }
+                }
+                for(int k=0;k<sc.size();k++){
+                    if(sc.at(k)->id==id){
+                        sc.at(k)->end();
+                        sc.removeAt(k);
+                        break;
+                    }
+                }
+
+            }
+            if(temp=="U"){
+                if(inf.find(id).value().state=="X"){
+                    for(int k=0;k<se.size();k++){
+                        if(se.at(k)->id==id){
+                            se.at(k)->end();
+                            se.removeAt(k);
+                            //temp_Sc->start();
+                            if(sc.size()!=0){
+                                sc.at(0)->end();
+
+                                Servered *temp_Se=new Servered();
+                                temp_Se->id=sc.at(0)->id;
+                                sc.removeAt(0);
+                                se.append(temp_Se);
+                                temp_Se->start();
+                            }
+
+                            break;
+                        }
+
+                    }
+                    for(int i=0;i<sc.size();i++){
+                        if(sc.at(i)->id==id){
+                            sc.at(i)->end();
+                            sc.removeAt(i);
+                            break;
+                        }
+                    }
+
+                }
+                send_message(number,id);
+
+            }
         }
-}
-
-void Server::send_message(int number,QString id)//发更新信息
+    }}
+void Server::send_message(int number, QString id)//发更新信息
 {
     QJsonObject request_On_Obj;
     QMap<QString, struct room>::iterator p;
@@ -180,16 +290,16 @@ void Server::send_message(int number,QString id)//发更新信息
 
 void Server::control(QJsonObject Request)
 {
-//    QString id=Request.value("id").toString();
-//    QString temp=Request.value("operator").toString();
-//    if(se.size()<6){
-//        // 服务队列不满
-//        Servered temp_Se;
-//        temp_Se.id=id;
+    //    QString id=Request.value("id").toString();
+    //    QString temp=Request.value("operator").toString();
+    //    if(se.size()<6){
+    //        // 服务队列不满
+    //        Servered temp_Se;
+    //        temp_Se.id=id;
 
 
 
-//    }
+    //    }
 }
 
 void Server::slot_Disconnected()//退房
@@ -257,5 +367,12 @@ void Server::on_pushButton_clicked()
 //}
 
 void Server::bill(){
+
+}
+
+//显示账单,有待改进
+void Server::on_button_generatebill_1_clicked(){
+    DSheet * d1=new DSheet();
+    d1->show();
 
 }

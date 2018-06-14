@@ -6,6 +6,7 @@
 #include <QDebug>
 #include <QWidget>
 #include <QtCore>
+#include <server.h>
 #define stall 1000
 using namespace std;
 
@@ -21,9 +22,9 @@ using namespace std;
 #define clo "S"
 #define updat "U"
 #define schedule_stall 2
-#define rate_low 0.1
-#define rate_mid 0.2
-#define rate_high 0.3
+#define rate_low 0.01
+#define rate_mid 0.02
+#define rate_high 0.25
 
 namespace Ui {
 class Client;

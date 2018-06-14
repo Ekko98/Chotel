@@ -7,6 +7,7 @@
 #include <QMap>
 #include <QList>
 #include<QTimer>
+#include<dsheet.h>
 
 #define zhire "W"
 #define zhileng "C"
@@ -20,9 +21,10 @@
 #define clo "S"
 #define updat "U"
 #define schedule_stall 2
-#define rate_low 0.1
-#define rate_mid 0.2
+#define rate_low 0.01
+#define rate_mid 0.02
 #define rate_high 0.25
+#define que_max 2
 
 class Servered:  QObject{
     Q_OBJECT
@@ -30,7 +32,7 @@ public:
     Servered(){}
     void start();
     void end();
-    int time=0;
+    int time;
     QString id;
     bool X=false;
     QTimer *t;
@@ -59,6 +61,7 @@ struct room{
     float fee;
     QString gear;
     QString state;
+    int time=0;
 };
 
 
@@ -87,6 +90,8 @@ public slots:
 private slots:
     void on_pushButton_clicked();
     void slot_Disconnected();
+
+    void on_button_generatebill_1_clicked();
 
 private:
     Ui::Server *ui;
