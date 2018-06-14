@@ -81,12 +81,13 @@ void Server::slotReadyRead()
             bool Inse=false;
             bool Insc=false;
             if(temp!="U"){
-                 insert_bill(id,temp);
+                insert_bill(id,temp);
             }
             if(temp=="O"){
                 //maybe some bug
                 if(inf.find(id)==inf.end()){
                     tmp.aircond_tem=standard;
+                    qDebug()<<tmp.aircond_tem;
                     tmp.fee=0;
                     tmp.state=zhileng;
                     tmp.roomtem=Request_Client.value("temperature").toString().toFloat();
@@ -148,6 +149,12 @@ void Server::slotReadyRead()
                     send_message(number,id);
                 }
             }
+            if(temp=="W"){
+                inf.find(id).value().state=zhire;
+            }
+            if(temp=="C"){
+                inf.find(id).value().state=zhileng;
+            }
             if(temp=="H"){
                 int k=0;
                 for(int i=0;i<se.size();i++){
@@ -199,7 +206,7 @@ void Server::slotReadyRead()
             }
             if(temp=="L"){
                 mi=inf.find(id);
-                mi->gear=low;               
+                mi->gear=low;
             }
             if(temp=="S"){
                 mi=inf.find(id);
@@ -209,16 +216,16 @@ void Server::slotReadyRead()
                         se.at(i)->end();
                         se.removeAt(i);
                         if(sc.size()!=0){
-                            int M=0;
+                            int Min=0;
                             for(int m=0;m<se.size();m++){
-                                if(se.at(m)->time>se.at(M)->time){
-                                    M=m;
+                                if(se.at(m)->time<se.at(Min)->time){
+                                    Min=m;
                                 }
                             }
-                            sc.at(M)->end();
+                            sc.at(Min)->end();
                             Servered *temp_Se=new Servered();
-                            temp_Se->id=sc.at(M)->id;
-                            sc.removeAt(M);
+                            temp_Se->id=sc.at(Min)->id;
+                            sc.removeAt(Min);
                             se.append(temp_Se);
                             temp_Se->start();
                         }
@@ -235,25 +242,31 @@ void Server::slotReadyRead()
                 }
 
             }
+            if(temp=="T"){
+                inf.find(id).value().aircond_tem=
+                        Request_Client.value("temperature").toString().toFloat();
+
+            }
             if(temp=="U"){
                 if(inf.find(id).value().state=="X"){
+                    qDebug()<<"Huiwen";
                     for(int k=0;k<se.size();k++){
                         if(se.at(k)->id==id){
                             se.at(k)->end();
                             se.removeAt(k);
                             //temp_Sc->start();
                             if(sc.size()!=0){
-                                int M=0;
-                                for(int m=0;m<se.size();m++){
-                                    if(se.at(m)->time>se.at(M)->time){
-                                        M=m;
+                                int Min=0;
+                                for(int m=0;m<sc.size();m++){
+                                    if(se.at(m)->time<se.at(Min)->time){
+                                        Min=m;
                                     }
                                 }
-                                sc.at(M)->end();
+                                sc.at(Min)->end();
 
                                 Servered *temp_Se=new Servered();
-                                temp_Se->id=sc.at(M)->id;
-                                sc.removeAt(M);
+                                temp_Se->id=sc.at(Min)->id;
+                                sc.removeAt(Min);
                                 se.append(temp_Se);
                                 temp_Se->start();
                             }
@@ -271,9 +284,7 @@ void Server::slotReadyRead()
                     }
 
                 }
-                send_message(number,id);
-                inf.find(id).value().aircond_tem=Request_Client.value("temperatrue").toString().toFloat();
-
+                 send_message(number,id);
             }
         }
     }}
@@ -287,6 +298,7 @@ void Server::send_message(int number, QString id)//发更新信息
         request_On_Obj.insert("temperature",QString::number(p.value().roomtem));
         request_On_Obj.insert("gear",p.value().gear);
         request_On_Obj.insert("fee",QString::number(p.value().fee));
+        request_On_Obj.insert("set_temperature",QString::number(p.value().aircond_tem));
         QJsonDocument request_On_Doc;
         request_On_Doc.setObject(request_On_Obj);
         QByteArray request_On_ByteArray=request_On_Doc.toJson(QJsonDocument::Compact);
@@ -402,11 +414,11 @@ void Server::init_db(){
         }
 
         create_sql = "create table bill ("
-                             "time varchar(50), "
-                             "id varchar(30), "
-                             "operation varchar(20),"
-                             "fee varchar(20)"
-                             ")";
+                     "time varchar(50), "
+                     "id varchar(30), "
+                     "operation varchar(20),"
+                     "fee varchar(20)"
+                     ")";
         sql_query.prepare(create_sql);
         if(!sql_query.exec())
         {
@@ -425,7 +437,7 @@ void Server::insert_bill(QString id,QString op){
         QString current_date =current_date_time.toString("yyyy.MM.dd hh:mm:ss");
         QMap<QString, struct room>::iterator p;
         p=inf.find(id);
-        if(p==inf.end()) break;
+
         QString insert_sql = "insert into bill values (?, ?, ?, ?)";
         QSqlQuery sql_query;
         sql_query.prepare(insert_sql);

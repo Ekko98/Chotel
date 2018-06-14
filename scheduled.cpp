@@ -16,23 +16,38 @@ void Scheduled::end(){
 
 void Scheduled::timer(){
     this->time--;
-    if(time==0){
+    if(this->time==0){
         for(int i=0;i<sc.size();i++){
             if(sc.at(i)->id==this->id){
                 sc.at(i)->end();
-                //judge isNull
-                se.at(0)->end();
-                Servered *temp_Se=new Servered();
-                temp_Se->id=this->id;
-
-                se.append(temp_Se);
-                temp_Se->start();
-                Scheduled * temp_Sc=new Scheduled();
-                temp_Sc->id=se.at(0)->id;
-                se.removeAt(0);
                 sc.removeAt(i);
-                sc.append(temp_Sc);
-                temp_Sc->start();
+                //judge isNull
+                if(se.size()>0){
+                    int M=0;
+                    for(int m=0;m<se.size();m++){
+                        if(se.at(m)->time>se.at(M)->time){
+                            M=m;
+                        }
+                    }
+                    se.at(M)->end();
+                    Scheduled * temp_Sc=new Scheduled();
+                    temp_Sc->id=se.at(M)->id;
+                    se.removeAt(M);
+                    sc.append(temp_Sc);
+                    temp_Sc->start();
+                    Servered *temp_Se=new Servered();
+                    temp_Se->id=this->id;
+                    se.append(temp_Se);
+                    temp_Se->start();
+
+                }
+                else{
+                    Servered *temp_Se=new Servered();
+                    temp_Se->id=this->id;
+                    se.append(temp_Se);
+                    temp_Se->start();
+
+                }
             }
         }
     }
