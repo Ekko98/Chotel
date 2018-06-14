@@ -44,7 +44,7 @@ void Server::slotNewConnection()
 {
     //处理客户端请求连接
     m_client=m_server->nextPendingConnection();
-    m_client->write("服务器连接成功!");
+    //m_client->write("服务器连接成功!");
     list_client.append(m_client);//添加至list
 
     //连接信号，接受客户端数据
@@ -121,11 +121,18 @@ void Server::slotReadyRead()
                             temp_Sc->start();
                         }
                         else{
-                            se.at(0)->end();
+
+                            int M=0;
+                            for(int m=0;m<se.size();m++){
+                                if(se.at(m)->time>se.at(M)->time){
+                                    M=m;
+                                }
+                            }
+                            se.at(M)->end();
                             Scheduled *temp_Sc=new Scheduled();
-                            temp_Sc->id=se.at(0)->id;
+                            temp_Sc->id=se.at(M)->id;
                             temp_Sc->start();
-                            se.removeAt(0);
+                            se.removeAt(M);
                             sc.append(temp_Sc);
 
                             Servered *temp_Se=new Servered();
@@ -162,11 +169,17 @@ void Server::slotReadyRead()
                 }
                 else if(Insc&&mi->gear!=high){
                     sc.removeAt(k);
-                    se.at(0)->end();
+                    int M=0;
+                    for(int m=0;m<se.size();m++){
+                        if(se.at(m)->time>se.at(M)->time){
+                            M=m;
+                        }
+                    }
+                    se.at(M)->end();
                     Scheduled *temp_Sc=new Scheduled();
-                    temp_Sc->id=se.at(0)->id;
+                    temp_Sc->id=se.at(M)->id;
                     temp_Sc->start();
-                    se.removeAt(0);
+                    se.removeAt(M);
                     sc.append(temp_Sc);
 
                     Servered *temp_Se=new Servered();
@@ -180,35 +193,10 @@ void Server::slotReadyRead()
             if(temp=="M"){
                 mi=inf.find(id);
                 mi->gear=mid;
-                //                if(se.size()<que_max){
-                //                    Servered *temp_Se=new Servered();
-                //                    temp_Se->id=id;
-                //                    se.append(temp_Se);
-                //                    temp_Se->start();
-                //                }
-                //                else{
-                //                    Scheduled *temp_Sc=new Scheduled();
-                //                    temp_Sc->id=id;
-                //                    sc.append(temp_Sc);
-                //                    temp_Sc->start();
-
-                //                }
             }
             if(temp=="L"){
                 mi=inf.find(id);
-                mi->gear=low;
-                //                if(se.size()<que_max){
-                //                    Servered *temp_Se=new Servered();
-                //                    temp_Se->id=id;
-                //                    se.append(temp_Se);
-                //                    temp_Se->start();
-                //                }
-                //                else{
-                //                    Scheduled *temp_Sc=new Scheduled();
-                //                    temp_Sc->id=id;
-                //                    sc.append(temp_Sc);
-                //                    temp_Sc->start();
-                //                }
+                mi->gear=low;               
             }
             if(temp=="S"){
                 mi=inf.find(id);
@@ -218,10 +206,16 @@ void Server::slotReadyRead()
                         se.at(i)->end();
                         se.removeAt(i);
                         if(sc.size()!=0){
-                            sc.at(0)->end();
+                            int M=0;
+                            for(int m=0;m<se.size();m++){
+                                if(se.at(m)->time>se.at(M)->time){
+                                    M=m;
+                                }
+                            }
+                            sc.at(M)->end();
                             Servered *temp_Se=new Servered();
-                            temp_Se->id=sc.at(0)->id;
-                            sc.removeAt(0);
+                            temp_Se->id=sc.at(M)->id;
+                            sc.removeAt(M);
                             se.append(temp_Se);
                             temp_Se->start();
                         }
@@ -246,11 +240,17 @@ void Server::slotReadyRead()
                             se.removeAt(k);
                             //temp_Sc->start();
                             if(sc.size()!=0){
-                                sc.at(0)->end();
+                                int M=0;
+                                for(int m=0;m<se.size();m++){
+                                    if(se.at(m)->time>se.at(M)->time){
+                                        M=m;
+                                    }
+                                }
+                                sc.at(M)->end();
 
                                 Servered *temp_Se=new Servered();
-                                temp_Se->id=sc.at(0)->id;
-                                sc.removeAt(0);
+                                temp_Se->id=sc.at(M)->id;
+                                sc.removeAt(M);
                                 se.append(temp_Se);
                                 temp_Se->start();
                             }

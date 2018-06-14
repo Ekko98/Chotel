@@ -24,7 +24,7 @@ Client::Client(QWidget *parent) :
     //创建套接字
     m_client = new QTcpSocket(this);
     //连接服务器
-    m_client->connectToHost("127.0.0.1",6666);
+    m_client->connectToHost("localhost",6666);
 
     //通过信号通信服务器
     connect(m_client, &QTcpSocket::readyRead,this, &Client::slotReadyRead);
@@ -143,10 +143,10 @@ void Client::slotSendOnOffMsg()
 
 //void Client::slotSendotherMsg()
 //{
-////    if(on_flag==true){
-////        write_obj("H");
-////        ui->input_mode->setText("制冷");
-////    }
+//    if(on_flag==true){
+//        write_obj("H");
+//        ui->input_mode->setText("制冷");
+//   }
 
 //    QJsonDocument request_On_Doc;
 //    request_On_Doc.setObject(request_On_Obj);
