@@ -24,13 +24,11 @@ Client::Client(QWidget *parent) :
     //创建套接字
     m_client = new QTcpSocket(this);
     //连接服务器
-    m_client->connectToHost("127.0.0.1",6666);
+    m_client->connectToHost("192.168.43.52",6666);
 
     //通过信号通信服务器
     connect(m_client, &QTcpSocket::readyRead,this, &Client::slotReadyRead);
     connect(m_client, &QTcpSocket::disconnected, this, &Client::slotDisconnected);
-
-
 }
 
 
@@ -54,7 +52,8 @@ void Client::slotReadyRead()
     QByteArray array=m_client->readAll();
     //QMessageBox::information(this,"Server Message",array);
     QJsonObject Request_Client=QJsonDocument::fromJson(array).object();
-    ui->input_t_room->setText(Request_Client.value("temperature").toString());
+    ui->input_t_room->setText(QString::number(
+                                  Request_Client.value("temperature").toString().toFloat(),'f',2));
     //ui->input_mode->setText(Request_Client.value("state").toString());
     ui->input_fee->setText(Request_Client.value("fee").toString());
     //ui->input_speed->setText(Request_Client.value("gear").toString());

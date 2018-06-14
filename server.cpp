@@ -44,7 +44,7 @@ void Server::slotNewConnection()
 {
     //处理客户端请求连接
     m_client=m_server->nextPendingConnection();
-    m_client->write("服务器连接成功!");
+    //m_client->write("服务器连接成功!");
     list_client.append(m_client);//添加至list
 
     //连接信号，接受客户端数据
@@ -80,6 +80,9 @@ void Server::slotReadyRead()
             QString temp=Request_Client.value("operator").toString();
             bool Inse=false;
             bool Insc=false;
+            if(temp!="U"){
+                 insert_bill(id,temp);
+            }
             if(temp=="O"){
                 //maybe some bug
                 if(inf.find(id)==inf.end()){
@@ -269,6 +272,7 @@ void Server::slotReadyRead()
 
                 }
                 send_message(number,id);
+                inf.find(id).value().aircond_tem=Request_Client.value("temperatrue").toString().toFloat();
 
             }
         }
@@ -386,7 +390,18 @@ void Server::init_db(){
     else
     {
         QSqlQuery sql_query;
-        QString create_sql = "create table bill ("
+        QString create_sql="drop table bill";
+        sql_query.prepare(create_sql);
+        if(!sql_query.exec())
+        {
+            qDebug() << "Error: Fail to drop table." << sql_query.lastError();
+        }
+        else
+        {
+            qDebug() << "Drop!";
+        }
+
+        create_sql = "create table bill ("
                              "time varchar(50), "
                              "id varchar(30), "
                              "operation varchar(20),"
@@ -410,6 +425,7 @@ void Server::insert_bill(QString id,QString op){
         QString current_date =current_date_time.toString("yyyy.MM.dd hh:mm:ss");
         QMap<QString, struct room>::iterator p;
         p=inf.find(id);
+        if(p==inf.end()) break;
         QString insert_sql = "insert into bill values (?, ?, ?, ?)";
         QSqlQuery sql_query;
         sql_query.prepare(insert_sql);
@@ -445,7 +461,6 @@ void Server::generate_bill(QString id){
             QString tid = sql_query.value(1).toString();
             QString top = sql_query.value(2).toString();
             QString fee = sql_query.value(3).toString();
-
         }
     }
 }
@@ -457,4 +472,6 @@ void Server::on_button_generatebill_1_clicked(){
     d1->show();
 
 }
+
+
 
