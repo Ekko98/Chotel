@@ -36,7 +36,10 @@ int Servered::work(){
             }
         }
         this->time++;
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
         if( (mi.value().roomtem-mi.value().aircond_tem)<=0)
         {
             mi.value().state="X";
