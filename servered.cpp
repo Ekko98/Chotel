@@ -36,6 +36,8 @@ int Servered::work(){
             }
         }
         this->time++;
+        this->op_time++;
+        inf.find(this->id).value().op_time=this->op_time;
         inf.find(this->id).value().time=this->time;
         if( (mi.value().roomtem-mi.value().aircond_tem)<=0)
         {
