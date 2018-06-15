@@ -37,6 +37,7 @@ public:
     void start();
     void end();
     int time;
+    int op_time=0;
     QString id;
     bool X=false;
     QTimer *t;

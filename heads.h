@@ -9,6 +9,6 @@ struct room{
     QString gear;
     QString state;
     int time=0;
-    int op_time;
+    int op_time=0;
 };
 #endif // HEADS_H

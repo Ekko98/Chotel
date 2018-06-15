@@ -180,9 +180,14 @@ void Server::slotReadyRead()
                     //                       temp_Se->id=id;
                     //                       se.append(temp_Se);
                     //                       temp_Se->start();
+                    qDebug()<<id+"在"+mi.value().gear+"下运行了"+QString::number(se.at(i)->op_time)+"s";
+                    //插入数据库
+                    mi.value().op_time=0;
+                    se.at(i)->op_time=0;
                 }
                 else if(Insc&&mi->gear!=high){
                     sc.removeAt(k);
+                    qDebug()<<id+"在"+mi.value().gear+"下运行了"+QString::number(mi.value().op_time)+"s";
                     int M=0;
                     for(int m=0;m<se.size();m++){
                         if(se.at(m)->time>se.at(M)->time){
@@ -206,10 +211,29 @@ void Server::slotReadyRead()
             }
             if(temp=="M"){
                 mi=inf.find(id);
+                qDebug()<<id+"在"+mi.value().gear+"下运行了"+QString::number(mi.value().op_time)+"s";
+                //插入数据库
+                for(int i=0;i<se.size();i++){
+                    if(se.at(i)->id==id){
+                        se.at(i)->op_time=0;
+                        break;
+                    }
+                }
+
+                mi.value().op_time=0;
                 mi->gear=mid;
             }
             if(temp=="L"){
                 mi=inf.find(id);
+                qDebug()<<id+"在"+mi.value().gear+"下运行了"+QString::number(mi.value().op_time)+"s";
+                //插入数据库
+                for(int i=0;i<se.size();i++){
+                    if(se.at(i)->id==id){
+                        se.at(i)->op_time=0;
+                        break;
+                    }
+                }
+                mi.value().op_time=0;
                 mi->gear=low;
             }
             if(temp=="S"){
