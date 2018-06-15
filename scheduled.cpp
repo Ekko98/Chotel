@@ -3,7 +3,7 @@ extern QMap<QString,struct room> inf;
 extern QList<Servered *> se;//6
 extern QList<Scheduled *> sc;//20
 void Scheduled::start(){
-    this->time=5;
+    this->time=15;
     t= new QTimer();
     connect(this->t,SIGNAL(timeout()),this,SLOT(timer()));
     this->t->start(1000);

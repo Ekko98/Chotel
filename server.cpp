@@ -1,7 +1,10 @@
 #include "server.h"
 #include "ui_server.h"
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+#include "singleuser.h"
 
-
+singleuser *s_uer[100];
 QMap<QString,struct room> inf;
 QList<Servered *> se;//6
 QList<Scheduled *> sc;//20
@@ -90,6 +93,7 @@ void Server::slotReadyRead()
                     //qDebug()<<Request_Client.value("temperature");
                     tmp.gear=mid;
                     inf.insert(id,tmp);
+                    addone(id);
                     if(se.size()<que_max){
                         Servered *temp_Se=new Servered();
                         temp_Se->id=id;
@@ -457,4 +461,61 @@ void Server::on_button_generatebill_1_clicked(){
     d1->show();
 
 }
+
+void Server::addone(QString id)
+{
+    int n=inf.size();
+    //QString id=QString::number(n);
+    s_uer[n-1]=new singleuser(0,id);
+    //int n=inf.size();
+    int row=5;//行
+    int col=3;//列
+
+    QWidget *window=new QWidget;
+    QHBoxLayout *h_layout = new QHBoxLayout[row];
+    QVBoxLayout *v_layout = new QVBoxLayout;
+
+    if(n<3)
+      col=n;
+
+    for(int j=0;j<row;j++)
+    {
+        if(j*col+1>n)
+          break;
+        for(int i=0;i<col;i++)
+        {
+            if(j*col+i+1>n)
+                break;
+            (&h_layout[j])->addWidget(s_uer[j*col+i]);
+            QObject::connect(this,SIGNAL(sendData(room)),s_uer[j*col+i],SLOT(receiveData(room)));
+            //QObject::connect(this,SIGNAL(add(QString)),s_uer[j*col+i],SLOT(adduser(QString)));
+        }
+        v_layout->addLayout(&h_layout[j]);
+     }
+
+    v_layout->addStretch(0);//设置layout不能被自动调整大小
+    v_layout->addStretch(0);
+    v_layout->addStretch(0);//layoutstretch里面的初始值为0,0,0，意思是三个控件的比例是1：1：1。
+    window->setLayout(v_layout);
+    window->setMinimumHeight(201*(n/3+1));
+    window->setMinimumWidth(147*3);
+    QSizePolicy policy=window->sizePolicy();
+    policy.setHorizontalStretch(1);
+    policy.setVerticalStretch(1);
+    policy.setHorizontalPolicy(QSizePolicy::Minimum);
+    policy.setVerticalPolicy(QSizePolicy::Minimum);
+    window->setSizePolicy(policy);
+
+    ui->scrollArea->setWidgetResizable(true);
+    ui->scrollArea->setWidget(window);  //必须做的一步，将这个子窗口imageLabel装进scrollArea
+}
+
+/*
+void Server::on_text11_clicked()
+{
+    room update;
+    update.fee=66;
+    emit sendData(update);
+}
+*/
 

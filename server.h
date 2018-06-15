@@ -1,6 +1,7 @@
 #ifndef SERVER_H
 #define SERVER_H
 
+#include "heads.h"
 #include <QtNetwork>
 #include <QMessageBox>
 #include <QWidget>
@@ -12,8 +13,6 @@
 #include <QSqlError>
 #include <QSqlQuery>
 #include <QDebug>
-
-
 #define zhire "W"
 #define zhileng "C"
 #define mid "M"
@@ -59,16 +58,6 @@ public slots:
      void timer();
 };
 
-struct room{
-
-    float roomtem;
-    float aircond_tem;
-    float fee;
-    QString gear;
-    QString state;
-    int time=0;
-};
-
 
 
 namespace Ui {
@@ -87,6 +76,8 @@ public:
     void insert_bill(QString id,QString op);
     void init_db();
     void generate_bill(QString id);
+    void addone(QString id);
+
     ~Server();
 public slots:
     void slotNewConnection();
@@ -97,7 +88,6 @@ public slots:
 private slots:
     void on_pushButton_clicked();
     void slot_Disconnected();
-
     void on_button_generatebill_1_clicked();
 
 private:
@@ -108,6 +98,8 @@ private:
     QByteArray message;
     int standard;
     QSqlDatabase database;
+signals:
+    void sendData(room);
 };
 
 
