@@ -30,16 +30,21 @@ SOURCES += \
     server.cpp \
     servered.cpp \
     scheduled.cpp \
-    dsheet.cpp
+    dsheet.cpp \
+    singleuser.cpp
 
 HEADERS += \
         mainwindow.h \
     client.h \
     server.h \
-    dsheet.h
+    dsheet.h \
+    singleuser.h \
+    heads.h
 
 FORMS += \
         mainwindow.ui \
     client.ui \
     server.ui \
-    dsheet.ui
+    dsheet.ui \
+    singleuser.ui
+
