@@ -181,9 +181,9 @@ void Client::on_button_mode_cold_clicked()
 //        m_client->write(request_On_ByteArray);
 //    }
 //    else{
-//        QMessageBox::information(this,"别瞎**乱动！","谢谢");
+//        QMessageBox::information(this,"提示！","谢谢");
 //    }
-    QMessageBox::information(this,"别瞎**乱动！","谢谢");
+    QMessageBox::information(this,"提示！","已经在制冷");
 
 }
 
@@ -202,7 +202,7 @@ void Client::on_button_mode_hot_clicked()
 //    else{
 //        QMessageBox::information(this,"别瞎**乱动！","谢谢");
 //    }
-    QMessageBox::information(this,"别瞎**乱动！","谢谢");
+    QMessageBox::information(this,"提示！","无法更改");
 }
 
 
@@ -218,7 +218,7 @@ void Client::on_button_speed_low_clicked()
         m_client->write(request_On_ByteArray);
     }
     else{
-        QMessageBox::information(this,"别瞎**乱动！","谢谢");
+        QMessageBox::information(this,"提示！","已是低速");
     }
 }
 
@@ -235,7 +235,7 @@ void Client::on_button_speed_middle_clicked()
         m_client->write(request_On_ByteArray);
     }
     else{
-        QMessageBox::information(this,"别瞎**乱动！","谢谢");
+        QMessageBox::information(this,"提示！","已是中速");
     }
 }
 
@@ -252,7 +252,7 @@ void Client::on_button_speed_high_clicked()
         m_client->write(request_On_ByteArray);
     }
     else{
-        QMessageBox::information(this,"别瞎**乱动！","谢谢");
+        QMessageBox::information(this,"提示！","已是高速");
     }
 }
 
@@ -325,7 +325,7 @@ void Client::huiwen(){
     //默认制冷时候升温
     num+=0.1;
     ui->input_t_room->setText(QString::number(num));
-
+    inf.find(ui->label_roomid->text()).value().roomtem=num;
     //ui->input_t_aircondi->setText(num1);
     if(num-num1>=2||num-num1<=-2){
         timer2->stop();

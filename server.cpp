@@ -87,7 +87,7 @@ void Server::slotReadyRead()
                 insert_bill(id,temp);
             }
             if(temp=="O"){
-                //maybe some bug
+
                 if(inf.find(id)==inf.end()){
                     tmp.aircond_tem=standard;
                     qDebug()<<tmp.aircond_tem;
@@ -114,7 +114,7 @@ void Server::slotReadyRead()
                 }
                 else{
                     inf.find(id).value().state=zhileng;
-                    inf.find(id).value().roomtem=Request_Client.value("temperature").toString().toFloat();
+                    //inf.find(id).value().roomtem=Request_Client.value("temperature").toString().toFloat();
                     if(se.size()<que_max){
                         Servered *temp_Se=new Servered();
                         temp_Se->id=id;
@@ -154,10 +154,10 @@ void Server::slotReadyRead()
                 }
             }
             if(temp=="W"){
-                inf.find(id).value().state=zhire;
+                //inf.find(id).value().state=zhire;
             }
             if(temp=="C"){
-                inf.find(id).value().state=zhileng;
+                //inf.find(id).value().state=zhileng;
             }
             if(temp=="H"){
                 int k=0;
@@ -310,19 +310,7 @@ void Server::send_message(int number, QString id)//发更新信息
     }
 }
 
-void Server::control(QJsonObject Request)
-{
-    //    QString id=Request.value("id").toString();
-    //    QString temp=Request.value("operator").toString();
-    //    if(se.size()<6){
-    //        // 服务队列不满
-    //        Servered temp_Se;
-    //        temp_Se.id=id;
 
-
-
-    //    }
-}
 
 void Server::slot_Disconnected()//退房
 {

@@ -72,7 +72,7 @@ public:
     explicit Server(QWidget *parent = 0);
     void send_message(int number,QString id);
     void read(QString id, room tmp);
-    void control(QJsonObject Request);
+
     void insert_bill(QString id,QString op);
     void init_db();
     void generate_bill(QString id);
@@ -93,8 +93,8 @@ private slots:
 
 private:
     Ui::Server *ui;
-    QTcpServer * m_server;
-    QTcpSocket * m_client;
+    QTcpServer * m_server=new QTcpServer();
+    QTcpSocket * m_client=new QTcpSocket();
     QList<QTcpSocket *> list_client;
     QByteArray message;
     int standard;
