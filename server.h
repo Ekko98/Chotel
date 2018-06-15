@@ -88,7 +88,7 @@ public slots:
 private slots:
     void on_pushButton_clicked();
     void slot_Disconnected();
-    void on_button_generatebill_1_clicked();
+    //void on_button_generatebill_1_clicked();
 
 
 private:

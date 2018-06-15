@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
+<<<<<<< Updated upstream
 <!-- Written by QtCreator 4.3.1, 2018-06-15T13:01:37. -->
+=======
+<!-- Written by QtCreator 4.0.3, 2018-06-15T15:39:53. -->
+>>>>>>> Stashed changes
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -292,6 +296,7 @@
     <value type="QString" key="Qt4ProjectManager.Qt4RunConfiguration.ProFile">CHotel.pro</value>
     <value type="bool" key="Qt4ProjectManager.Qt4RunConfiguration.UseDyldImageSuffix">false</value>
     <value type="QString" key="Qt4ProjectManager.Qt4RunConfiguration.UserWorkingDirectory"></value>
+<<<<<<< Updated upstream
     <value type="QString" key="Qt4ProjectManager.Qt4RunConfiguration.UserWorkingDirectory.default">E:/qt/build-CHotel-Desktop_Qt_5_9_0_MinGW_32bit-Debug</value>
     <value type="uint" key="RunConfiguration.QmlDebugServerPort">3768</value>
     <value type="bool" key="RunConfiguration.UseCppDebugger">false</value>
@@ -537,6 +542,9 @@
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Custom Executable</value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName"></value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">ProjectExplorer.CustomExecutableRunConfiguration</value>
+=======
+    <value type="QString" key="Qt4ProjectManager.Qt4RunConfiguration.UserWorkingDirectory.default"></value>
+>>>>>>> Stashed changes
     <value type="uint" key="RunConfiguration.QmlDebugServerPort">3768</value>
     <value type="bool" key="RunConfiguration.UseCppDebugger">false</value>
     <value type="bool" key="RunConfiguration.UseCppDebuggerAuto">true</value>
