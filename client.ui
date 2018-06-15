@@ -219,7 +219,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>温度调节</string>
+    <string>温度修改</string>
    </property>
   </widget>
   <widget class="QPushButton" name="button_checkout">
@@ -300,32 +300,6 @@
     <string>高速</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="button_up_1">
-   <property name="geometry">
-    <rect>
-     <x>90</x>
-     <y>270</y>
-     <width>75</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>调高一度</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="button_down_1">
-   <property name="geometry">
-    <rect>
-     <x>180</x>
-     <y>270</y>
-     <width>75</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>调低一度</string>
-   </property>
-  </widget>
   <widget class="QLineEdit" name="input_t_room">
    <property name="geometry">
     <rect>
@@ -347,6 +321,29 @@
    </property>
    <property name="text">
     <string>房间温度</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="input_change_aircondi">
+   <property name="geometry">
+    <rect>
+     <x>90</x>
+     <y>270</y>
+     <width>71</width>
+     <height>16</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="Button_changeT">
+   <property name="geometry">
+    <rect>
+     <x>180</x>
+     <y>270</y>
+     <width>41</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>修改</string>
    </property>
   </widget>
  </widget>

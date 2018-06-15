@@ -62,12 +62,14 @@ private slots:
 
     void on_button_speed_high_clicked();
 
-    void on_button_up_1_clicked();
+//    void on_button_up_1_clicked();
 
-    void on_button_down_1_clicked();
+//    void on_button_down_1_clicked();
 
     void on_button_checkout_clicked();
 
+
+    void on_Button_changeT_clicked();
 
 private:
     Ui::Client *ui;

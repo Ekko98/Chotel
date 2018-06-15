@@ -90,6 +90,7 @@ private slots:
     void slot_Disconnected();
     void on_button_generatebill_1_clicked();
 
+
 private:
     Ui::Server *ui;
     QTcpServer * m_server;
