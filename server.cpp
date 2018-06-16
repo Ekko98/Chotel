@@ -83,6 +83,9 @@ void Server::slotReadyRead()
             QString temp=Request_Client.value("operator").toString();
             bool Inse=false;
             bool Insc=false;
+            if(temp=="H" || temp=="M" || temp=="L" || temp="S"){
+                update_bill(id);
+            }
             if(temp!="U"){
                 insert_bill(id,temp);
             }
@@ -433,7 +436,8 @@ void Server::init_db(){
                      "time varchar(50), "
                      "id varchar(30), "
                      "operation varchar(20),"
-                     "fee varchar(20)"
+                     "fee varchar(20),"
+                     "last varchar(20)"
                      ")";
         sql_query.prepare(create_sql);
         if(!sql_query.exec())
@@ -453,14 +457,14 @@ void Server::insert_bill(QString id,QString op){
         QString current_date =current_date_time.toString("yyyy.MM.dd hh:mm:ss");
         QMap<QString, struct room>::iterator p;
         p=inf.find(id);
-
-        QString insert_sql = "insert into bill values (?, ?, ?, ?)";
+        QString insert_sql = "insert into bill values (?, ?, ?, ?,?)";
         QSqlQuery sql_query;
         sql_query.prepare(insert_sql);
         sql_query.addBindValue(current_date);
         sql_query.addBindValue(id);
         sql_query.addBindValue(op);
         sql_query.addBindValue(QString::number(p->fee));
+        sql_query.addBindValue("");
         if(!sql_query.exec())
         {
             qDebug() << sql_query.lastError();
@@ -469,6 +473,26 @@ void Server::insert_bill(QString id,QString op){
         {
             qDebug() << "inserted!";
         }
+    }
+}
+
+void Server::update_bill(QString id){
+    QMap<QString, struct room>::iterator p;
+    p=inf.find(id);
+    QString update_sql = "update bill set last = :last where id = :id "
+                         "and time=(select max(time) from bill where id= :tid)";
+    QSqlQuery sql_query;
+    sql_query.prepare(update_sql);
+    sql_query.bindValue(":last", QString::number(p->op_time));
+    sql_query.bindValue(":id",id);
+    sql_query.bindValue(":tid",id);
+    if(!sql_query.exec())
+    {
+        qDebug() << sql_query.lastError();
+    }
+    else
+    {
+        qDebug() << "updated!";
     }
 }
 

@@ -75,6 +75,7 @@ public:
     void read(QString id, room tmp);
 
     void insert_bill(QString id,QString op);
+    void update_bill(QString id);
     void init_db();
     void generate_bill(QString id);
     void addone(QString id);
@@ -89,7 +90,7 @@ public slots:
 private slots:
     void on_pushButton_clicked();
     void slot_Disconnected();
-    //void on_button_generatebill_1_clicked();
+    void on_button_generatebill_1_clicked();
 
 
 private:
