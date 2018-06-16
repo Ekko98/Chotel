@@ -6,6 +6,7 @@
 
 singleuser *s_uer[100];
 QMap<QString,struct room> inf;
+QMap<int,QString> SocketId;
 QList<Servered *> se;//6
 QList<Scheduled *> sc;//20
 Server::Server(QWidget *parent) :
@@ -94,6 +95,9 @@ void Server::slotReadyRead()
             if(temp=="O"){
 
                 if(inf.find(id)==inf.end()){
+                    SocketId.insert(i,id);
+
+                    /////////////////////////
                     tmp.aircond_tem=standard;
                     qDebug()<<tmp.aircond_tem;
                     tmp.fee=0;
@@ -354,10 +358,17 @@ void Server::slot_Disconnected()//退房
     for(int i = 0;i < list_client.length();i ++){
         if(list_client.at(i)->state() != QAbstractSocket::ConnectedState)
         {
-            list_client.at(i)->deleteLater();
-            list_client.removeAt(i);
-            //ui->label_room1_roomtem->setText("");
-            QMessageBox::information(this,"Client Message","退房");
+
+           if(SocketId.find(i)!=SocketId.end()){
+               QString id=SocketId.find(i).value();
+                this->deleteone(id);
+               //inf.remove(id);
+               SocketId.remove(i);
+               list_client.at(i)->deleteLater();
+               list_client.removeAt(i);
+               //ui->label_room1_roomtem->setText("");
+               QMessageBox::information(this,"Client Message","退房");
+           }
         }
     }
     //ui->widget_room1->hide();
@@ -587,7 +598,7 @@ void Server::addone(QString id)
 
 void Server::deleteone(QString id)
 {
-    int n;
+    int n=0;
     for(int i=0;i<inf.size();i++){
         if(s_uer[i]->id==id){
             n=i;

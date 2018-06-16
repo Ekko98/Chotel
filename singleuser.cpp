@@ -14,7 +14,7 @@ singleuser::singleuser(QWidget *parent,QString id) :
     this->id=id;
     ui->roomlabel->setText(id);
     timer=new QTimer();
-    timer->start(0);
+    timer->start();
     //timer->start(stall);
     connect(timer,&QTimer::timeout,this,&singleuser::Output);
     QObject::connect(this,SIGNAL(deletethis(QString)),Admin,SLOT(deleteone(QString)));
@@ -27,16 +27,17 @@ singleuser::~singleuser()
 
 void singleuser::Output()
 {
-
-    QMap<QString,room>::iterator it; //遍历map
-    it=inf.find(this->id);
-    if(it==inf.end()){
+    QMap<QString,struct room>::iterator p;
+    p=inf.find(this->id);
+    if(p==inf.end()){
         timer->stop();
         return;
     }
-    room update=it.value();
+    room update=p.value();
+
     if(update.state=="S"){
         ui->mode->setText("已关机");
+
     }
     else if(update.state=="W"){
         ui->mode->setText("制热");

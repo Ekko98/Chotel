@@ -42,6 +42,7 @@ int Servered::work(){
         if( (mi.value().roomtem-mi.value().aircond_tem)<=0)
         {
             mi.value().state="X";
+            return 1;
             //qDebug()<<"X";
         }
         else

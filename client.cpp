@@ -29,7 +29,7 @@ Client::Client(QWidget *parent) :
     m_client->connectToHost("127.0.0.1",6666);
 
 
-    m_client->connectToHost("172.20.10.3",8765);
+    m_client->connectToHost("127.0.0.1",6666);
 //ddlyt172.20.10.9
 
     //通过信号通信服务器
@@ -228,7 +228,7 @@ void Client::on_button_speed_low_clicked()
         m_client->write(request_On_ByteArray);
     }
     else{
-        QMessageBox::information(this,"提示！","已是低速");
+        QMessageBox::information(this,"提示！","无法生效");
     }
 }
 
@@ -246,7 +246,7 @@ void Client::on_button_speed_middle_clicked()
         m_client->write(request_On_ByteArray);
     }
     else{
-        QMessageBox::information(this,"提示！","已是中速");
+        QMessageBox::information(this,"提示！","无法生效");
     }
 }
 
@@ -264,7 +264,7 @@ void Client::on_button_speed_high_clicked()
         m_client->write(request_On_ByteArray);
     }
     else{
-        QMessageBox::information(this,"提示！","已是高速");
+        QMessageBox::information(this,"提示！","无法生效");
     }
 }
 
