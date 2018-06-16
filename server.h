@@ -75,6 +75,7 @@ public:
     void read(QString id, room tmp);
 
     void insert_bill(QString id,QString op);
+    void update_bill(QString id);
     void init_db();
     void generate_bill(QString id);
     void addone(QString id);
