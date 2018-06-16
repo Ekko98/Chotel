@@ -212,6 +212,7 @@ void Server::slotReadyRead()
 
                 }
                 mi->gear=high;
+                send_message(number,id);
             }
             if(temp=="M"){
                 mi=inf.find(id);
@@ -226,6 +227,7 @@ void Server::slotReadyRead()
 
                 mi.value().op_time=0;
                 mi->gear=mid;
+                send_message(number,id);
             }
             if(temp=="L"){
                 mi=inf.find(id);
@@ -239,6 +241,7 @@ void Server::slotReadyRead()
                 }
                 mi.value().op_time=0;
                 mi->gear=low;
+                send_message(number,id);
             }
             if(temp=="S"){
                 mi=inf.find(id);
@@ -272,11 +275,12 @@ void Server::slotReadyRead()
                         break;
                     }
                 }
-
+                send_message(number,id);
             }
             if(temp=="T"){
                 inf.find(id).value().aircond_tem=
                         Request_Client.value("temperature").toString().toFloat();
+                send_message(number,id);
 
             }
             if(temp=="U"){
@@ -479,7 +483,7 @@ void Server::insert_bill(QString id,QString op){
 }
 
 void Server::generate_bill(QString id){
-    QString select_sql = "select * from student where id=:id";\
+    QString select_sql = "select * from student where id=:id";
     QSqlQuery sql_query;
     sql_query.prepare(select_sql);
     sql_query.bindValue(":id","\""+id+"\"");
@@ -491,7 +495,8 @@ void Server::generate_bill(QString id){
     {
         while(sql_query.next())
         {
-            QString ttime = sql_query.value(0).toString();
+            if(sql_query.at()==0)
+                QString ttime = sql_query.value(0).toString();
             QString tid = sql_query.value(1).toString();
             QString top = sql_query.value(2).toString();
             QString fee = sql_query.value(3).toString();
@@ -502,8 +507,7 @@ void Server::generate_bill(QString id){
 
 //显示账单,有待改进
 void Server::on_button_generatebill_1_clicked(){
-    DSheet * d1=new DSheet();
-    d1->show();
+
 
 }
 

@@ -24,6 +24,12 @@ private slots:
     void receiveData(room update);
     //void adduser(QString id);
 
+    void on_generatebill_1_clicked();
+
+
+
+    void on_pushButton_clicked();
+
 private:
     Ui::singleuser *ui;
 };

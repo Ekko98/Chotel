@@ -23,9 +23,9 @@ Client::Client(QWidget *parent) :
     room_set=26;
     //创建套接字
     m_client = new QTcpSocket(this);
-    //连接服务器
+    //连接服务器775130043269596887562979318431744
 
-    m_client->connectToHost("192.168.43.17",6666);
+    m_client->connectToHost("172.20.10.3",8765);
 //ddlyt172.20.10.9
 
     //通过信号通信服务器
@@ -105,7 +105,7 @@ void Client::slotSendOnOffMsg()
         on_flag=true;
         if(inf.find(ui->label_roomid->text())==inf.end())
         {
-            ui->input_t_room->setText("30");
+            ui->input_t_room->setText("100");
             //ui->input_t_aircondi->setText("26");
         }
         write_obj("O");
