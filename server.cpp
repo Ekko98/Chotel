@@ -8,7 +8,6 @@ singleuser *s_uer[100];
 QMap<QString,struct room> inf;
 QList<Servered *> se;//6
 QList<Scheduled *> sc;//20
-
 Server::Server(QWidget *parent) :
     QWidget(parent),
     m_server(NULL),
@@ -326,6 +325,7 @@ void Server::control(QJsonObject Request)
 
 void Server::slot_Disconnected()//退房
 {
+
     for(int i = 0;i < list_client.length();i ++){
         if(list_client.at(i)->state() != QAbstractSocket::ConnectedState)
         {
@@ -493,9 +493,9 @@ void Server::on_button_generatebill_1_clicked(){
 void Server::addone(QString id)
 {
     int n=inf.size();
-    //QString id=QString::number(n);
-    s_uer[n-1]=new singleuser(0,id);
-    //int n=inf.size();
+    if(id!="null"){
+        s_uer[n-1]=new singleuser(0,id);
+    }
     int row=5;//行
     int col=3;//列
 
@@ -536,8 +536,26 @@ void Server::addone(QString id)
 
     ui->scrollArea->setWidgetResizable(true);
     ui->scrollArea->setWidget(window);  //必须做的一步，将这个子窗口imageLabel装进scrollArea
+    this->repaint();
+    this->update();
 }
 
+void Server::deleteone(QString id)
+{
+    int n;
+    for(int i=0;i<inf.size();i++){
+        if(s_uer[i]->id==id){
+            n=i;
+            break;
+        }
+    }
+    for(int i=n;i<inf.size();i++){
+        s_uer[i]=s_uer[i+1];
+    }
+    delete s_uer[inf.size()];
+    inf.remove(id);
+    addone("null");
+}
 /*
 void Server::on_text11_clicked()
 {

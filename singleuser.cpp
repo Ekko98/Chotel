@@ -17,8 +17,11 @@ singleuser::singleuser(QWidget *parent,QString id) :
     timer->start(0);
     //timer->start(stall);
     connect(timer,&QTimer::timeout,this,&singleuser::Output);
+    QObject::connect(this,SIGNAL(deletethis(QString)),Admin,SLOT(deleteone(QString)));
     //connect(Admin,SIGNAL(sendData(QString)),this,SLOT(receiveData(QString)));
     //connect(Admin,SIGNAL(add(QString)),this,SLOT(adduser(QString)));
+
+    //ui->aircond_tem->setContentsMargins(5, 0, 3, 1);
 }
 
 singleuser::~singleuser()
@@ -29,7 +32,13 @@ singleuser::~singleuser()
 void singleuser::Output()
 {
 
-    room update=inf.find(this->id).value();
+    QMap<QString,room>::iterator it; //遍历map
+    it=inf.find(this->id);
+    if(it==inf.end()){
+        timer->stop();
+        return;
+    }
+    room update=it.value();
     if(update.state=="S"){
         ui->mode->setText("已关机");
     }
@@ -99,3 +108,8 @@ void singleuser::adduser(QString id){
      }
 
 */
+
+void singleuser::on_generatebill_1_clicked()
+{
+    emit deletethis(this->id);
+}

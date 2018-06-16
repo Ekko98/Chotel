@@ -84,6 +84,7 @@ public slots:
     void slotReadyRead();
     void slotAcceptError();
     void slotDestroyed();
+    void deleteone(QString id);
 
 private slots:
     void on_pushButton_clicked();

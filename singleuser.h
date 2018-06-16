@@ -18,11 +18,15 @@ public:
     QTimer *timer;
     //void Output(room update);
 
+signals:
+    void deletethis(QString id);
 public slots:
     void Output();
 private slots:
     void receiveData(room update);
     //void adduser(QString id);
+
+    void on_generatebill_1_clicked();
 
 private:
     Ui::singleuser *ui;
