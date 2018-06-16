@@ -561,8 +561,7 @@ void Server::addone(QString id)
             if(j*col+i+1>n)
                 break;
             (&h_layout[j])->addWidget(s_uer[j*col+i]);
-            QObject::connect(this,SIGNAL(sendData(room)),s_uer[j*col+i],SLOT(receiveData(room)));
-            //QObject::connect(this,SIGNAL(add(QString)),s_uer[j*col+i],SLOT(adduser(QString)));
+            //QObject::connect(this,SIGNAL(sendData(room)),s_uer[j*col+i],SLOT(receiveData(room)));
         }
         v_layout->addLayout(&h_layout[j]);
      }
@@ -598,7 +597,7 @@ void Server::deleteone(QString id)
     for(int i=n;i<inf.size();i++){
         s_uer[i]=s_uer[i+1];
     }
-    delete s_uer[inf.size()];
+    delete s_uer[inf.size()-1];
     inf.remove(id);
     addone("null");
 }
