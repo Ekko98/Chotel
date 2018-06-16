@@ -71,8 +71,10 @@ void Server::slotReadyRead()
     for(int i = 0;i < list_client.length();i ++)
     {
         message=list_client.at(i)->readAll();
+        message.remove(message.size()-1,1);
         if(!message.isEmpty()){
             number=i;
+            qDebug()<<message;
             //QMessageBox::information(this,"Client Message",message);
             QJsonObject Request_Client=QJsonDocument::fromJson(message).object();
             struct room tmp;
@@ -81,6 +83,7 @@ void Server::slotReadyRead()
             QMap<QString, struct room>::iterator mi;
             //ui->label_room1_roomtem->setText(Request_Client.value("temperature").toString());
             QString temp=Request_Client.value("operator").toString();
+            qDebug()<<temp;
             bool Inse=false;
             bool Insc=false;
             if(temp!="U"){
@@ -114,7 +117,7 @@ void Server::slotReadyRead()
                 }
                 else{
                     inf.find(id).value().state=zhileng;
-                    //inf.find(id).value().roomtem=Request_Client.value("temperature").toString().toFloat();
+                    inf.find(id).value().roomtem=Request_Client.value("temperature").toString().toFloat();
                     if(se.size()<que_max){
                         Servered *temp_Se=new Servered();
                         temp_Se->id=id;
@@ -150,8 +153,9 @@ void Server::slotReadyRead()
                         }
 
                     }
-                    send_message(number,id);
+
                 }
+                send_message(number,id);
             }
             if(temp=="W"){
                 //inf.find(id).value().state=zhire;
@@ -330,6 +334,8 @@ void Server::send_message(int number, QString id)//发更新信息
         QJsonDocument request_On_Doc;
         request_On_Doc.setObject(request_On_Obj);
         QByteArray request_On_ByteArray=request_On_Doc.toJson(QJsonDocument::Compact);
+        request_On_ByteArray+='\n';
+        qDebug()<<request_On_ByteArray;
         list_client.at(number)->write(request_On_ByteArray);
     }
 }
