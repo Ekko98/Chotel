@@ -6,6 +6,7 @@
 
 singleuser *s_uer[100];
 QMap<QString,struct room> inf;
+QMap<int,QString> SocketId;
 QList<Servered *> se;//6
 QList<Scheduled *> sc;//20
 
@@ -95,6 +96,9 @@ void Server::slotReadyRead()
             if(temp=="O"){
 
                 if(inf.find(id)==inf.end()){
+                    SocketId.insert(i,id);
+
+                    /////////////////////////
                     tmp.aircond_tem=standard;
                     qDebug()<<tmp.aircond_tem;
                     tmp.fee=0;
@@ -354,6 +358,9 @@ void Server::slot_Disconnected()//退房
     for(int i = 0;i < list_client.length();i ++){
         if(list_client.at(i)->state() != QAbstractSocket::ConnectedState)
         {
+            QString id=SocketId.find(i).value();
+            inf.remove(id);
+            SocketId.remove(i);
             list_client.at(i)->deleteLater();
             list_client.removeAt(i);
             //ui->label_room1_roomtem->setText("");

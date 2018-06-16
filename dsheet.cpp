@@ -39,13 +39,15 @@ void DSheet::generateDF(QString id)
                     ui->lineEdit_time->setText(ttime);
                 }
                 QString top = sql_query.value(2).toString();
+                QString optime=sql_query.value(4).toString();
                 qDebug()<<top;
                 QTableWidgetItem * item_time=new QTableWidgetItem(ttime);
                 QTableWidgetItem * item_top=new QTableWidgetItem(top);
-                //QTableWidgetItem *item_optime=new QTableWidgetItem(optime);
+                QTableWidgetItem *item_optime=new QTableWidgetItem(optime);
                 ui->tableWidget_op->insertRow(i);
                 ui->tableWidget_op->setItem(i,0,item_time);
                 ui->tableWidget_op->setItem(i,1,item_top);
+                ui->tableWidget_op->setItem(i,2,item_optime);
                 i++;
                 first++;
             }

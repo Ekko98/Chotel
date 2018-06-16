@@ -80,6 +80,7 @@ public:
     void generate_bill(QString id);
     void addone(QString id);
 
+
     ~Server();
 public slots:
     void slotNewConnection();

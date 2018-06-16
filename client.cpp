@@ -25,7 +25,7 @@ Client::Client(QWidget *parent) :
     m_client = new QTcpSocket(this);
     //连接服务器775130043269596887562979318431744
 
-    m_client->connectToHost("172.20.10.3",8765);
+    m_client->connectToHost("127.0.0.1",6666);
 //ddlyt172.20.10.9
 
     //通过信号通信服务器
