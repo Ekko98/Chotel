@@ -99,3 +99,30 @@ void singleuser::adduser(QString id){
      }
 
 */
+
+void singleuser::on_generatebill_1_clicked()
+{
+    if(ui->mode->text()=="已关机"){
+        DSheet * d=new DSheet();
+        d->generateDF(ui->roomlabel->text());
+        d->show();
+    }
+    else{
+        qDebug()<<"关机后重试";
+    }
+}
+
+
+
+void singleuser::on_pushButton_clicked()
+{
+    if(inf.find(id).value().state=="S")
+    {
+        inf.erase(inf.find(id));
+        qDebug()<<id<<"已退房";
+
+    }
+    else{
+         qDebug()<<id<<"无法强制退房";
+        }
+}

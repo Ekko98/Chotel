@@ -23,10 +23,10 @@ Client::Client(QWidget *parent) :
     room_set=26;
     //创建套接字
     m_client = new QTcpSocket(this);
-    //连接服务器
+    //连接服务器775130043269596887562979318431744
 
-    m_client->connectToHost("localhost",6666);
-
+    m_client->connectToHost("172.20.10.3",8765);
+//ddlyt172.20.10.9
 
     //通过信号通信服务器
     connect(m_client, &QTcpSocket::readyRead,this, &Client::slotReadyRead);
@@ -53,6 +53,8 @@ void Client::slotReadyRead()
 {
     QByteArray array=m_client->readAll();
     //QMessageBox::information(this,"Server Message",array);
+    array.remove(array.size()-1,1);
+    qDebug()<<array;
     QJsonObject Request_Client=QJsonDocument::fromJson(array).object();
     ui->input_t_room->setText(QString::number(
                                   Request_Client.value("temperature").toString().toFloat(),'f',2));
@@ -103,13 +105,14 @@ void Client::slotSendOnOffMsg()
         on_flag=true;
         if(inf.find(ui->label_roomid->text())==inf.end())
         {
-            ui->input_t_room->setText("30");
+            ui->input_t_room->setText("100");
             //ui->input_t_aircondi->setText("26");
         }
         write_obj("O");
         QJsonDocument request_On_Doc;
         request_On_Doc.setObject(request_On_Obj);
         QByteArray request_On_ByteArray=request_On_Doc.toJson(QJsonDocument::Compact);
+        request_On_ByteArray+='\n';
         m_client->write(request_On_ByteArray);
         timer2->stop();
 
@@ -136,6 +139,7 @@ void Client::slotSendOnOffMsg()
         QJsonDocument request_On_Doc;
         request_On_Doc.setObject(request_On_Obj);
         QByteArray request_On_ByteArray=request_On_Doc.toJson(QJsonDocument::Compact);
+        request_On_ByteArray+='\n';
         m_client->write(request_On_ByteArray);
         //timer->stop();
         ui->button_On_Off->setText("开机");
@@ -215,6 +219,7 @@ void Client::on_button_speed_low_clicked()
         QJsonDocument request_On_Doc;
         request_On_Doc.setObject(request_On_Obj);
         QByteArray request_On_ByteArray=request_On_Doc.toJson(QJsonDocument::Compact);
+        request_On_ByteArray+='\n';
         m_client->write(request_On_ByteArray);
     }
     else{
@@ -232,6 +237,7 @@ void Client::on_button_speed_middle_clicked()
         QJsonDocument request_On_Doc;
         request_On_Doc.setObject(request_On_Obj);
         QByteArray request_On_ByteArray=request_On_Doc.toJson(QJsonDocument::Compact);
+        request_On_ByteArray+='\n';
         m_client->write(request_On_ByteArray);
     }
     else{
@@ -249,6 +255,7 @@ void Client::on_button_speed_high_clicked()
         QJsonDocument request_On_Doc;
         request_On_Doc.setObject(request_On_Obj);
         QByteArray request_On_ByteArray=request_On_Doc.toJson(QJsonDocument::Compact);
+        request_On_ByteArray+='\n';
         m_client->write(request_On_ByteArray);
     }
     else{
@@ -314,6 +321,7 @@ void Client::slot_send(){
     QJsonDocument request_On_Doc;
     request_On_Doc.setObject(request_On_Obj);
     QByteArray request_On_ByteArray=request_On_Doc.toJson(QJsonDocument::Compact);
+    request_On_ByteArray+='\n';
     m_client->write(request_On_ByteArray);
 }
 
@@ -336,6 +344,7 @@ void Client::huiwen(){
             QJsonDocument request_On_Doc;
             request_On_Doc.setObject(request_On_Obj);
             QByteArray request_On_ByteArray=request_On_Doc.toJson(QJsonDocument::Compact);
+            request_On_ByteArray+='\n';
             m_client->write(request_On_ByteArray);
         }
         else{
@@ -353,6 +362,7 @@ void Client::on_Button_changeT_clicked()
         QJsonDocument request_On_Doc;
         request_On_Doc.setObject(request_On_Obj);
         QByteArray request_On_ByteArray=request_On_Doc.toJson(QJsonDocument::Compact);
+        request_On_ByteArray+='\n';
         m_client->write(request_On_ByteArray);
     }
 }

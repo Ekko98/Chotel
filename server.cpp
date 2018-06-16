@@ -71,8 +71,10 @@ void Server::slotReadyRead()
     for(int i = 0;i < list_client.length();i ++)
     {
         message=list_client.at(i)->readAll();
+        message.remove(message.size()-1,1);
         if(!message.isEmpty()){
             number=i;
+            qDebug()<<message;
             //QMessageBox::information(this,"Client Message",message);
             QJsonObject Request_Client=QJsonDocument::fromJson(message).object();
             struct room tmp;
@@ -81,6 +83,7 @@ void Server::slotReadyRead()
             QMap<QString, struct room>::iterator mi;
             //ui->label_room1_roomtem->setText(Request_Client.value("temperature").toString());
             QString temp=Request_Client.value("operator").toString();
+            qDebug()<<temp;
             bool Inse=false;
             bool Insc=false;
             if(temp=="H" || temp=="M" || temp=="L" || temp=="S"){
@@ -117,7 +120,7 @@ void Server::slotReadyRead()
                 }
                 else{
                     inf.find(id).value().state=zhileng;
-                    //inf.find(id).value().roomtem=Request_Client.value("temperature").toString().toFloat();
+                    inf.find(id).value().roomtem=Request_Client.value("temperature").toString().toFloat();
                     if(se.size()<que_max){
                         Servered *temp_Se=new Servered();
                         temp_Se->id=id;
@@ -153,8 +156,9 @@ void Server::slotReadyRead()
                         }
 
                     }
-                    send_message(number,id);
+
                 }
+                send_message(number,id);
             }
             if(temp=="W"){
                 //inf.find(id).value().state=zhire;
@@ -211,6 +215,7 @@ void Server::slotReadyRead()
 
                 }
                 mi->gear=high;
+                send_message(number,id);
             }
             if(temp=="M"){
                 mi=inf.find(id);
@@ -225,6 +230,7 @@ void Server::slotReadyRead()
 
                 mi.value().op_time=0;
                 mi->gear=mid;
+                send_message(number,id);
             }
             if(temp=="L"){
                 mi=inf.find(id);
@@ -238,6 +244,7 @@ void Server::slotReadyRead()
                 }
                 mi.value().op_time=0;
                 mi->gear=low;
+                send_message(number,id);
             }
             if(temp=="S"){
                 mi=inf.find(id);
@@ -271,11 +278,12 @@ void Server::slotReadyRead()
                         break;
                     }
                 }
-
+                send_message(number,id);
             }
             if(temp=="T"){
                 inf.find(id).value().aircond_tem=
                         Request_Client.value("temperature").toString().toFloat();
+                send_message(number,id);
 
             }
             if(temp=="U"){
@@ -333,6 +341,8 @@ void Server::send_message(int number, QString id)//发更新信息
         QJsonDocument request_On_Doc;
         request_On_Doc.setObject(request_On_Obj);
         QByteArray request_On_ByteArray=request_On_Doc.toJson(QJsonDocument::Compact);
+        request_On_ByteArray+='\n';
+        qDebug()<<request_On_ByteArray;
         list_client.at(number)->write(request_On_ByteArray);
     }
 }
@@ -497,7 +507,7 @@ void Server::update_bill(QString id){
 }
 
 void Server::generate_bill(QString id){
-    QString select_sql = "select * from student where id=:id";\
+    QString select_sql = "select * from student where id=:id";
     QSqlQuery sql_query;
     sql_query.prepare(select_sql);
     sql_query.bindValue(":id","\""+id+"\"");
@@ -509,7 +519,8 @@ void Server::generate_bill(QString id){
     {
         while(sql_query.next())
         {
-            QString ttime = sql_query.value(0).toString();
+            if(sql_query.at()==0)
+                QString ttime = sql_query.value(0).toString();
             QString tid = sql_query.value(1).toString();
             QString top = sql_query.value(2).toString();
             QString fee = sql_query.value(3).toString();
@@ -520,8 +531,7 @@ void Server::generate_bill(QString id){
 
 //显示账单,有待改进
 void Server::on_button_generatebill_1_clicked(){
-    DSheet * d1=new DSheet();
-    d1->show();
+
 
 }
 
