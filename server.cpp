@@ -83,7 +83,7 @@ void Server::slotReadyRead()
             QString temp=Request_Client.value("operator").toString();
             bool Inse=false;
             bool Insc=false;
-            if(temp=="H" || temp=="M" || temp=="L" || temp="S"){
+            if(temp=="H" || temp=="M" || temp=="L" || temp=="S"){
                 update_bill(id);
             }
             if(temp!="U"){
@@ -479,8 +479,8 @@ void Server::insert_bill(QString id,QString op){
 void Server::update_bill(QString id){
     QMap<QString, struct room>::iterator p;
     p=inf.find(id);
-    QString update_sql = "update bill set last = :last where id = :id "
-                         "and time=(select max(time) from bill where id= :tid)";
+    QString update_sql = "update bill set last = :last where id = :id and operation <> 'T' "
+                         "and time =( select max(time) from bill where id= :tid and operation <> 'T')";
     QSqlQuery sql_query;
     sql_query.prepare(update_sql);
     sql_query.bindValue(":last", QString::number(p->op_time));
