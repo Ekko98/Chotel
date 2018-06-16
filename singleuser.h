@@ -28,6 +28,12 @@ private slots:
 
     void on_generatebill_1_clicked();
 
+
+
+
+    void on_pushButton_clicked();
+
+
 private:
     Ui::singleuser *ui;
 };

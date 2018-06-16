@@ -18,10 +18,6 @@ singleuser::singleuser(QWidget *parent,QString id) :
     //timer->start(stall);
     connect(timer,&QTimer::timeout,this,&singleuser::Output);
     QObject::connect(this,SIGNAL(deletethis(QString)),Admin,SLOT(deleteone(QString)));
-    //connect(Admin,SIGNAL(sendData(QString)),this,SLOT(receiveData(QString)));
-    //connect(Admin,SIGNAL(add(QString)),this,SLOT(adduser(QString)));
-
-    //ui->aircond_tem->setContentsMargins(5, 0, 3, 1);
 }
 
 singleuser::~singleuser()
@@ -111,5 +107,29 @@ void singleuser::adduser(QString id){
 
 void singleuser::on_generatebill_1_clicked()
 {
-    emit deletethis(this->id);
+
+    if(ui->mode->text()=="已关机"){
+        DSheet * d=new DSheet();
+        d->generateDF(ui->roomlabel->text());
+        d->show();
+    }
+    else{
+        qDebug()<<"关机后重试";
+    }
+}
+
+
+
+void singleuser::on_pushButton_clicked()
+{
+    if(inf.find(id).value().state=="S")
+    {
+        emit deletethis(this->id);
+        inf.erase(inf.find(id));
+        qDebug()<<id<<"已退房";
+
+    }
+    else{
+         qDebug()<<id<<"无法强制退房";
+        }
 }

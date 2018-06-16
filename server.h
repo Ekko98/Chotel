@@ -18,16 +18,16 @@
 #define mid "M"
 #define high "H"
 #define low "L"
-#define fee_mid 2
-#define fee_low 1
-#define fee_high 3
+#define fee_mid 0.2
+#define fee_low 0.1
+#define fee_high 0.3
 #define ope "O"
 #define clo "S"
 #define updat "U"
 #define schedule_stall 2
-#define rate_low 0.01
-#define rate_mid 0.02
-#define rate_high 0.25
+#define rate_low 0.1
+#define rate_mid 0.2
+#define rate_high 0.3
 #define que_max 2
 
 class Servered:  QObject{
@@ -37,6 +37,7 @@ public:
     void start();
     void end();
     int time;
+    int op_time=0;
     QString id;
     bool X=false;
     QTimer *t;
@@ -72,8 +73,9 @@ public:
     explicit Server(QWidget *parent = 0);
     void send_message(int number,QString id);
     void read(QString id, room tmp);
-    void control(QJsonObject Request);
+
     void insert_bill(QString id,QString op);
+    void update_bill(QString id);
     void init_db();
     void generate_bill(QString id);
     void addone(QString id);
@@ -94,8 +96,8 @@ private slots:
 
 private:
     Ui::Server *ui;
-    QTcpServer * m_server;
-    QTcpSocket * m_client;
+    QTcpServer * m_server=new QTcpServer();
+    QTcpSocket * m_client=new QTcpSocket();
     QList<QTcpSocket *> list_client;
     QByteArray message;
     int standard;

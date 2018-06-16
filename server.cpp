@@ -70,8 +70,10 @@ void Server::slotReadyRead()
     for(int i = 0;i < list_client.length();i ++)
     {
         message=list_client.at(i)->readAll();
+        message.remove(message.size()-1,1);
         if(!message.isEmpty()){
             number=i;
+            qDebug()<<message;
             //QMessageBox::information(this,"Client Message",message);
             QJsonObject Request_Client=QJsonDocument::fromJson(message).object();
             struct room tmp;
@@ -80,13 +82,17 @@ void Server::slotReadyRead()
             QMap<QString, struct room>::iterator mi;
             //ui->label_room1_roomtem->setText(Request_Client.value("temperature").toString());
             QString temp=Request_Client.value("operator").toString();
+            qDebug()<<temp;
             bool Inse=false;
             bool Insc=false;
+            if(temp=="H" || temp=="M" || temp=="L" || temp=="S"){
+                update_bill(id);
+            }
             if(temp!="U"){
                 insert_bill(id,temp);
             }
             if(temp=="O"){
-                //maybe some bug
+
                 if(inf.find(id)==inf.end()){
                     tmp.aircond_tem=standard;
                     qDebug()<<tmp.aircond_tem;
@@ -149,14 +155,15 @@ void Server::slotReadyRead()
                         }
 
                     }
-                    send_message(number,id);
+
                 }
+                send_message(number,id);
             }
             if(temp=="W"){
-                inf.find(id).value().state=zhire;
+                //inf.find(id).value().state=zhire;
             }
             if(temp=="C"){
-                inf.find(id).value().state=zhileng;
+                //inf.find(id).value().state=zhileng;
             }
             if(temp=="H"){
                 int k=0;
@@ -179,9 +186,14 @@ void Server::slotReadyRead()
                     //                       temp_Se->id=id;
                     //                       se.append(temp_Se);
                     //                       temp_Se->start();
+                    qDebug()<<id+"在"+mi.value().gear+"下运行了"+QString::number(se.at(i)->op_time)+"s";
+                    //插入数据库
+                    mi.value().op_time=0;
+                    se.at(i)->op_time=0;
                 }
                 else if(Insc&&mi->gear!=high){
                     sc.removeAt(k);
+                    qDebug()<<id+"在"+mi.value().gear+"下运行了"+QString::number(mi.value().op_time)+"s";
                     int M=0;
                     for(int m=0;m<se.size();m++){
                         if(se.at(m)->time>se.at(M)->time){
@@ -202,14 +214,36 @@ void Server::slotReadyRead()
 
                 }
                 mi->gear=high;
+                send_message(number,id);
             }
             if(temp=="M"){
                 mi=inf.find(id);
+                qDebug()<<id+"在"+mi.value().gear+"下运行了"+QString::number(mi.value().op_time)+"s";
+                //插入数据库
+                for(int i=0;i<se.size();i++){
+                    if(se.at(i)->id==id){
+                        se.at(i)->op_time=0;
+                        break;
+                    }
+                }
+
+                mi.value().op_time=0;
                 mi->gear=mid;
+                send_message(number,id);
             }
             if(temp=="L"){
                 mi=inf.find(id);
+                qDebug()<<id+"在"+mi.value().gear+"下运行了"+QString::number(mi.value().op_time)+"s";
+                //插入数据库
+                for(int i=0;i<se.size();i++){
+                    if(se.at(i)->id==id){
+                        se.at(i)->op_time=0;
+                        break;
+                    }
+                }
+                mi.value().op_time=0;
                 mi->gear=low;
+                send_message(number,id);
             }
             if(temp=="S"){
                 mi=inf.find(id);
@@ -243,11 +277,12 @@ void Server::slotReadyRead()
                         break;
                     }
                 }
-
+                send_message(number,id);
             }
             if(temp=="T"){
                 inf.find(id).value().aircond_tem=
                         Request_Client.value("temperature").toString().toFloat();
+                send_message(number,id);
 
             }
             if(temp=="U"){
@@ -305,23 +340,13 @@ void Server::send_message(int number, QString id)//发更新信息
         QJsonDocument request_On_Doc;
         request_On_Doc.setObject(request_On_Obj);
         QByteArray request_On_ByteArray=request_On_Doc.toJson(QJsonDocument::Compact);
+        request_On_ByteArray+='\n';
+        qDebug()<<request_On_ByteArray;
         list_client.at(number)->write(request_On_ByteArray);
     }
 }
 
-void Server::control(QJsonObject Request)
-{
-    //    QString id=Request.value("id").toString();
-    //    QString temp=Request.value("operator").toString();
-    //    if(se.size()<6){
-    //        // 服务队列不满
-    //        Servered temp_Se;
-    //        temp_Se.id=id;
 
-
-
-    //    }
-}
 
 void Server::slot_Disconnected()//退房
 {
@@ -421,7 +446,8 @@ void Server::init_db(){
                      "time varchar(50), "
                      "id varchar(30), "
                      "operation varchar(20),"
-                     "fee varchar(20)"
+                     "fee varchar(20),"
+                     "last varchar(20)"
                      ")";
         sql_query.prepare(create_sql);
         if(!sql_query.exec())
@@ -441,14 +467,14 @@ void Server::insert_bill(QString id,QString op){
         QString current_date =current_date_time.toString("yyyy.MM.dd hh:mm:ss");
         QMap<QString, struct room>::iterator p;
         p=inf.find(id);
-
-        QString insert_sql = "insert into bill values (?, ?, ?, ?)";
+        QString insert_sql = "insert into bill values (?, ?, ?, ?,?)";
         QSqlQuery sql_query;
         sql_query.prepare(insert_sql);
         sql_query.addBindValue(current_date);
         sql_query.addBindValue(id);
         sql_query.addBindValue(op);
         sql_query.addBindValue(QString::number(p->fee));
+        sql_query.addBindValue("");
         if(!sql_query.exec())
         {
             qDebug() << sql_query.lastError();
@@ -460,8 +486,28 @@ void Server::insert_bill(QString id,QString op){
     }
 }
 
+void Server::update_bill(QString id){
+    QMap<QString, struct room>::iterator p;
+    p=inf.find(id);
+    QString update_sql = "update bill set last = :last where id = :id and operation <> 'T' "
+                         "and time =( select max(time) from bill where id= :tid and operation <> 'T')";
+    QSqlQuery sql_query;
+    sql_query.prepare(update_sql);
+    sql_query.bindValue(":last", QString::number(p->op_time));
+    sql_query.bindValue(":id",id);
+    sql_query.bindValue(":tid",id);
+    if(!sql_query.exec())
+    {
+        qDebug() << sql_query.lastError();
+    }
+    else
+    {
+        qDebug() << "updated!";
+    }
+}
+
 void Server::generate_bill(QString id){
-    QString select_sql = "select * from student where id=:id";\
+    QString select_sql = "select * from student where id=:id";
     QSqlQuery sql_query;
     sql_query.prepare(select_sql);
     sql_query.bindValue(":id","\""+id+"\"");
@@ -473,7 +519,8 @@ void Server::generate_bill(QString id){
     {
         while(sql_query.next())
         {
-            QString ttime = sql_query.value(0).toString();
+            if(sql_query.at()==0)
+                QString ttime = sql_query.value(0).toString();
             QString tid = sql_query.value(1).toString();
             QString top = sql_query.value(2).toString();
             QString fee = sql_query.value(3).toString();
@@ -484,8 +531,7 @@ void Server::generate_bill(QString id){
 
 //显示账单,有待改进
 void Server::on_button_generatebill_1_clicked(){
-    DSheet * d1=new DSheet();
-    d1->show();
+
 
 }
 
