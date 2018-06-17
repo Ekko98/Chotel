@@ -39,7 +39,8 @@ int Servered::work(){
         this->op_time++;
         inf.find(this->id).value().op_time=this->op_time;
         inf.find(this->id).value().time=this->time;
-        if( (mi.value().roomtem-mi.value().aircond_tem)<=0)
+        if( ((mi.value().roomtem-mi.value().aircond_tem)<=0 && mi.value().state==zhileng) ||
+              ((mi.value().roomtem-mi.value().aircond_tem)>=0 && mi.value().state==zhire ) )
         {
             mi.value().state="X";
             return 1;

@@ -101,7 +101,7 @@ void Server::slotReadyRead()
                     tmp.aircond_tem=standard;
                     qDebug()<<tmp.aircond_tem;
                     tmp.fee=0;
-                    tmp.state=zhileng;
+                    tmp.state=zhire;
                     tmp.roomtem=Request_Client.value("temperature").toString().toFloat();
                     //qDebug()<<Request_Client.value("temperature");
                     tmp.gear=mid;
@@ -122,7 +122,7 @@ void Server::slotReadyRead()
                     }
                 }
                 else{
-                    inf.find(id).value().state=zhileng;
+                    inf.find(id).value().state=zhire;
                     inf.find(id).value().roomtem=Request_Client.value("temperature").toString().toFloat();
                     if(se.size()<que_max){
                         Servered *temp_Se=new Servered();

@@ -81,6 +81,7 @@ private:
     QString gear;
     float temperature;
     float fee;
+    int cflag;
 };
 
 #endif // CLIENT_H

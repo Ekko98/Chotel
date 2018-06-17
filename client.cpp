@@ -28,15 +28,15 @@ Client::Client(QWidget *parent) :
 
     //m_client->connectToHost("10.8.182.114",8004);
 
-//m_client->connectToHost("10.8.223.75",6666);
-   m_client->connectToHost("127.0.0.1",6666);
+    //m_client->connectToHost("localhost",6666);
+     m_client->connectToHost("192.168.137.1",6666);
 //ddlyt172.20.10.9
 
     //通过信号通信服务器
     connect(m_client, &QTcpSocket::readyRead,this, &Client::slotReadyRead);
     connect(m_client, &QTcpSocket::disconnected, this, &Client::slotDisconnected);
     //m_filterexp->setContentsMargins(5, 0, 3, 1);
-    ui->input_t_room->setText("100");
+    ui->input_t_room->setText("15");
 }
 
 
@@ -76,9 +76,11 @@ void Client::slotReadyRead()
     }
     else if(temp=="W"){
         ui->input_mode->setText("制热");
+        cflag=0;
     }
     else if(temp=="C"){
         ui->input_mode->setText("制冷");
+        cflag=1;
     }
     else if(temp=="A"){
         ui->input_mode->setText("自动");
@@ -333,11 +335,18 @@ void Client::huiwen(){
     float num = ui->input_t_room->text().toFloat();
     float num1 = ui->input_t_aircondi->text().toFloat();
     //默认制冷时候升温
-    num+=0.1;
+    if(cflag==1){
+        num+=0.1;
+    }
+    else if(cflag==0){
+        num-=0.1;
+    }
+
     ui->input_t_room->setText(QString::number(num));
     //inf.find(ui->label_roomid->text()).value().roomtem=num;
     //ui->input_t_aircondi->setText(num1);
-    if(num-num1>=2||num-num1<=-2){
+
+    if( (cflag==0&&num-num1<=-2) || (cflag==1&&num-num1>=2) ){
         timer2->stop();
 
         if(ui->button_On_Off->text()=="关机"){
