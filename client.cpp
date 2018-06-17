@@ -20,22 +20,23 @@ Client::Client(QWidget *parent) :
     connect(timer2,&QTimer::timeout,this,&Client::huiwen);
     connect(timer,&QTimer::timeout,this,&Client::slot_send);
     on_flag=false;
-    room_set=26;
+    //room_set=26;
     //创建套接字
     m_client = new QTcpSocket(this);
 
     //连接服务器
 
-    m_client->connectToHost("127.0.0.1",6666);
+    //m_client->connectToHost("10.8.182.114",8004);
 
-
-    m_client->connectToHost("127.0.0.1",6666);
+//m_client->connectToHost("10.8.223.75",6666);
+   m_client->connectToHost("127.0.0.1",6666);
 //ddlyt172.20.10.9
 
     //通过信号通信服务器
     connect(m_client, &QTcpSocket::readyRead,this, &Client::slotReadyRead);
     connect(m_client, &QTcpSocket::disconnected, this, &Client::slotDisconnected);
     //m_filterexp->setContentsMargins(5, 0, 3, 1);
+    ui->input_t_room->setText("100");
 }
 
 
@@ -108,11 +109,7 @@ void Client::slotSendOnOffMsg()
         ui->button_On_Off->setText("关机");
         //m_client->write("hello,I am");
         on_flag=true;
-        if(inf.find(ui->label_roomid->text())==inf.end())
-        {
-            ui->input_t_room->setText("100");
-            //ui->input_t_aircondi->setText("26");
-        }
+
         write_obj("O");
         QJsonDocument request_On_Doc;
         request_On_Doc.setObject(request_On_Obj);
@@ -338,7 +335,7 @@ void Client::huiwen(){
     //默认制冷时候升温
     num+=0.1;
     ui->input_t_room->setText(QString::number(num));
-    inf.find(ui->label_roomid->text()).value().roomtem=num;
+    //inf.find(ui->label_roomid->text()).value().roomtem=num;
     //ui->input_t_aircondi->setText(num1);
     if(num-num1>=2||num-num1<=-2){
         timer2->stop();

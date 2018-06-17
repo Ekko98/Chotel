@@ -15,7 +15,7 @@ Server::Server(QWidget *parent) :
     m_client(NULL),
     ui(new Ui::Server)
 {
-    standard=26;
+    standard=15;//set 空调初始温度
     setAttribute(Qt::WA_DeleteOnClose);
     ui->setupUi(this);
     // 创建套接字对象
@@ -86,7 +86,7 @@ void Server::slotReadyRead()
             qDebug()<<temp;
             bool Inse=false;
             bool Insc=false;
-            if(temp=="H" || temp=="M" || temp=="L" || temp=="S"){
+            if(temp=="H" || temp=="M" || temp=="L" || temp=="S"|| temp=="O"){
                 update_bill(id);
             }
             if(temp!="U"){
@@ -326,7 +326,7 @@ void Server::slotReadyRead()
                     }
 
                 }
-                 send_message(number,id);
+                send_message(number,id);
             }
         }
     }}
@@ -359,16 +359,16 @@ void Server::slot_Disconnected()//退房
         if(list_client.at(i)->state() != QAbstractSocket::ConnectedState)
         {
 
-           if(SocketId.find(i)!=SocketId.end()){
-               QString id=SocketId.find(i).value();
-                this->deleteone(id);
-               //inf.remove(id);
-               SocketId.remove(i);
-               list_client.at(i)->deleteLater();
-               list_client.removeAt(i);
-               //ui->label_room1_roomtem->setText("");
-               QMessageBox::information(this,"Client Message","退房");
-           }
+            if(SocketId.find(i)!=SocketId.end()){
+                QString id=SocketId.find(i).value();
+                //this->deleteone(id);
+                //inf.remove(id);
+                SocketId.remove(i);
+                list_client.at(i)->deleteLater();
+                list_client.removeAt(i);
+                //ui->label_room1_roomtem->setText("");
+                QMessageBox::information(this,"Client Message","退房");
+            }
         }
     }
     //ui->widget_room1->hide();
@@ -483,7 +483,15 @@ void Server::insert_bill(QString id,QString op){
         sql_query.prepare(insert_sql);
         sql_query.addBindValue(current_date);
         sql_query.addBindValue(id);
-        sql_query.addBindValue(op);
+        if(op=="O"){
+            if(p!=inf.end())
+                sql_query.addBindValue(op+"("+p->gear+")");
+            else
+                sql_query.addBindValue(op+"(M)");
+        }
+        else {
+            sql_query.addBindValue(op);
+        }
         sql_query.addBindValue(QString::number(p->fee));
         sql_query.addBindValue("");
         if(!sql_query.exec())
@@ -500,6 +508,7 @@ void Server::insert_bill(QString id,QString op){
 void Server::update_bill(QString id){
     QMap<QString, struct room>::iterator p;
     p=inf.find(id);
+    if(p==inf.end()) return;
     QString update_sql = "update bill set last = :last where id = :id and operation <> 'T' "
                          "and time =( select max(time) from bill where id= :tid and operation <> 'T')";
     QSqlQuery sql_query;
@@ -561,12 +570,12 @@ void Server::addone(QString id)
     QVBoxLayout *v_layout = new QVBoxLayout;
 
     if(n<3)
-      col=n;
+        col=n;
 
     for(int j=0;j<row;j++)
     {
         if(j*col+1>n)
-          break;
+            break;
         for(int i=0;i<col;i++)
         {
             if(j*col+i+1>n)
@@ -575,7 +584,7 @@ void Server::addone(QString id)
             //QObject::connect(this,SIGNAL(sendData(room)),s_uer[j*col+i],SLOT(receiveData(room)));
         }
         v_layout->addLayout(&h_layout[j]);
-     }
+    }
 
     v_layout->addStretch(0);//设置layout不能被自动调整大小
     v_layout->addStretch(0);
