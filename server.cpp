@@ -15,7 +15,7 @@ Server::Server(QWidget *parent) :
     m_client(NULL),
     ui(new Ui::Server)
 {
-    standard=15;//set 空调初始温度
+    standard=20;//set 空调初始温度
     setAttribute(Qt::WA_DeleteOnClose);
     ui->setupUi(this);
     // 创建套接字对象
@@ -258,8 +258,8 @@ void Server::slotReadyRead()
                         se.removeAt(i);
                         if(sc.size()!=0){
                             int Min=0;
-                            for(int m=0;m<se.size();m++){
-                                if(se.at(m)->time<se.at(Min)->time){
+                            for(int m=0;m<sc.size();m++){
+                                if(sc.at(m)->time<sc.at(Min)->time){
                                     Min=m;
                                 }
                             }
@@ -300,7 +300,7 @@ void Server::slotReadyRead()
                             if(sc.size()!=0){
                                 int Min=0;
                                 for(int m=0;m<sc.size();m++){
-                                    if(se.at(m)->time<se.at(Min)->time){
+                                    if(sc.at(m)->time<sc.at(Min)->time){
                                         Min=m;
                                     }
                                 }

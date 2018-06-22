@@ -18,17 +18,17 @@
 #define mid "M"
 #define high "H"
 #define low "L"
-#define fee_mid 0.2
-#define fee_low 0.1
-#define fee_high 0.3
+#define fee_mid 0.03
+#define fee_low 0.016
+#define fee_high 0.05
 #define ope "O"
 #define clo "S"
 #define updat "U"
 #define schedule_stall 2
-#define rate_low 0.1
-#define rate_mid 0.2
-#define rate_high 0.3
-#define que_max 2
+#define rate_low 0.16
+#define rate_mid 0.03
+#define rate_high 0.05
+#define que_max 5
 
 class Servered:  QObject{
     Q_OBJECT

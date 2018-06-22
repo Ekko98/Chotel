@@ -26,10 +26,10 @@ Client::Client(QWidget *parent) :
 
     //连接服务器
 
-    //m_client->connectToHost("10.8.182.114",8004);
+    m_client->connectToHost("192.168.1.102",6666);
 
     //m_client->connectToHost("localhost",6666);
-     m_client->connectToHost("192.168.137.1",6666);
+    // m_client->connectToHost("192.168.137.73",8080);
 //ddlyt172.20.10.9
 
     //通过信号通信服务器
@@ -60,7 +60,7 @@ void Client::slotReadyRead()
     QByteArray array=m_client->readAll();
     //QMessageBox::information(this,"Server Message",array);
     array.remove(array.size()-1,1);
-    qDebug()<<array;
+    //qDebug()<<array;
     QJsonObject Request_Client=QJsonDocument::fromJson(array).object();
     ui->input_t_room->setText(QString::number(
                                   Request_Client.value("temperature").toString().toFloat(),'f',2));
@@ -77,6 +77,7 @@ void Client::slotReadyRead()
     else if(temp=="W"){
         ui->input_mode->setText("制热");
         cflag=0;
+        //qDebug()<<"meicuo";
     }
     else if(temp=="C"){
         ui->input_mode->setText("制冷");
@@ -332,31 +333,32 @@ void Client::slot_send(){
 
 //something wrong
 void Client::huiwen(){
-    float num = ui->input_t_room->text().toFloat();
+    float num = ui->input_t_room->text().toFloat();//fangian
     float num1 = ui->input_t_aircondi->text().toFloat();
     //默认制冷时候升温
     if(cflag==1){
-        num+=0.1;
+        num+=(float)1;
     }
     else if(cflag==0){
-        num-=0.1;
+        num-=(float)1;
     }
-
+    //qDebug()<<num;
     ui->input_t_room->setText(QString::number(num));
     //inf.find(ui->label_roomid->text()).value().roomtem=num;
     //ui->input_t_aircondi->setText(num1);
 
-    if( (cflag==0&&num-num1<=-2) || (cflag==1&&num-num1>=2) ){
+    if( (cflag==0 && num-num1<=-2) || (cflag==1 && num-num1>=2) ){
         timer2->stop();
 
         if(ui->button_On_Off->text()=="关机"){
-            timer->start(stall);
+
             write_obj("O");//
             QJsonDocument request_On_Doc;
             request_On_Doc.setObject(request_On_Obj);
             QByteArray request_On_ByteArray=request_On_Doc.toJson(QJsonDocument::Compact);
             request_On_ByteArray+='\n';
             m_client->write(request_On_ByteArray);
+            timer->start(stall);
         }
         else{
             ui->input_mode->setText("已关机");

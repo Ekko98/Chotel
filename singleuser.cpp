@@ -14,7 +14,7 @@ singleuser::singleuser(QWidget *parent,QString id) :
     this->id=id;
     ui->roomlabel->setText(id);
     timer=new QTimer();
-    timer->start();
+    timer->start(1000);
     //timer->start(stall);
     connect(timer,&QTimer::timeout,this,&singleuser::Output);
     QObject::connect(this,SIGNAL(deletethis(QString)),Admin,SLOT(deleteone(QString)));
